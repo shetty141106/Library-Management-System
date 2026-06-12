@@ -5,7 +5,7 @@ import com.project.lms.Dto.ApiResponse;
 import com.project.lms.Dto.BooksRequest;
 import com.project.lms.Dto.BooksResponse;
 import com.project.lms.Entity.Books;
-import com.project.lms.Repository.BooksRepository;
+import com.project.lms.Dao.BooksDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +16,9 @@ import java.util.Optional;
 public class BooksService {
 
     @Autowired
-    private BooksRepository booksRepository;
+    private BooksDao booksDao;
 
+<<<<<<< HEAD
     private BooksResponse toBookResponse(Books books){
         return new BooksResponse(
                 books.getIsbn(), books.getTitle(), books.getEdition(), books.getAuthName(), books.getPrice(), books.getCategory()
@@ -84,5 +85,36 @@ public class BooksService {
             return ApiResponse.fail("Book not found.");
         booksRepository.deleteById(isbn);
         return ApiResponse.ok("Book Deleted", null);
+=======
+    public List<Books> getAllBooks() {
+        return booksDao.findAll();
+    }
+
+    public Books getBookByIsbn(String isbn) {
+        return booksDao.findById(isbn);
+    }
+
+    public Books addBook(Books book) {
+        return booksDao.save(book);
+    }
+
+    public Books updateBook(String isbn, Books book) {
+
+        Books existingBook = booksDao.findById(isbn);
+        if (existingBook == null) {
+            return null;
+        }
+
+        existingBook.setTitle(book.getTitle());
+        existingBook.setAuthName(book.getAuthName());
+        existingBook.setPrice(book.getPrice());
+
+        return booksDao.update(existingBook);
+
+    }
+
+    public void deleteBook(String isbn) {
+        booksDao.deleteById(isbn);
+>>>>>>> ff9746a (Implemented Hibernate CRUD operations for Books)
     }
 }
