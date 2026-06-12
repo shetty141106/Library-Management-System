@@ -83,8 +83,7 @@ public class BooksDao  {
        finally {
             s.close();
         }
-
-        return book;
+        return Optional.ofNullable(book);
     }
 
     public void deleteById(String isbn) {
