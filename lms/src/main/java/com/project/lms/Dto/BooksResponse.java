@@ -12,4 +12,5 @@ public class BooksResponse {
     private String authName;
     private double price;
     private String category;
+    private int Quantity;
 }

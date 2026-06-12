@@ -1,5 +1,6 @@
 package com.project.lms.Dto;
 
+import com.project.lms.Entity.Reader;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,4 +14,5 @@ public class BooksRequest {
     private String authName;
     private double price;
     private String category;
+    private int Quantity;
 }
