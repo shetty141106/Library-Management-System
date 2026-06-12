@@ -71,7 +71,7 @@ public class BooksDao  {
 
     }
 
-    public Books findById(String isbn) {
+    public Optional<Books> findById(String isbn) {
         Session s=sf.openSession();
         Books book=null;
         try{

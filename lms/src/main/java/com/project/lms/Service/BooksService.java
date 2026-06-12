@@ -18,36 +18,35 @@ public class BooksService {
     @Autowired
     private BooksDao booksDao;
 
-<<<<<<< HEAD
-    private BooksResponse toBookResponse(Books books){
+    private BooksResponse toBookResponse(Books books) {
         return new BooksResponse(
                 books.getIsbn(), books.getTitle(), books.getEdition(), books.getAuthName(), books.getPrice(), books.getCategory()
         );
     }
 
     public ApiResponse<List<BooksResponse>> getAllBooks() {
-        List<Books> books = booksRepository.findAll();
-        if(books.isEmpty())
+        List<Books> books = booksDao.findAll();
+        if (books.isEmpty())
             return ApiResponse.fail("No books available currently.");
         List<BooksResponse> res = books.stream().map(this::toBookResponse).toList();
         return ApiResponse.ok("All Books Fetched.", res);
     }
 
     public ApiResponse<BooksResponse> getBookByIsbn(String isbn) {
-        Optional<Books> booksOptional = booksRepository.findById(isbn);
-        if(booksOptional.isEmpty())
+        Optional<Books> booksOptional = booksDao.findById(isbn);
+        if (booksOptional.isEmpty())
             return ApiResponse.fail("Book not found.");
         Books books = booksOptional.get();
         return ApiResponse.ok("Book Fetched.", toBookResponse(books));
     }
 
     public ApiResponse<BooksResponse> addBook(BooksRequest bookreq) {
-        if(bookreq.getAuthName().isBlank() || bookreq.getTitle().isBlank() || bookreq.getIsbn().isBlank() || bookreq.getCategory().isBlank() || bookreq.getPrice() != 0)
+        if (bookreq.getAuthName().isBlank() || bookreq.getTitle().isBlank() || bookreq.getIsbn().isBlank() || bookreq.getCategory().isBlank() || bookreq.getPrice() != 0)
             return ApiResponse.fail("All fields are required.");
-        if(!bookreq.getIsbn().equals(bookreq.getConfirm_isbn()))
+        if (!bookreq.getIsbn().equals(bookreq.getConfirm_isbn()))
             return ApiResponse.fail("Isbn does not match.");
-        Optional<Books> booksOptional = booksRepository.findById(bookreq.getIsbn());
-        if(booksOptional.isPresent())
+        Optional<Books> booksOptional = booksDao.findById(bookreq.getIsbn());
+        if (booksOptional.isPresent())
             return ApiResponse.fail("Book with this Isbn already exists.");
         Books books = new Books();
         books.setIsbn(bookreq.getIsbn());
@@ -56,65 +55,35 @@ public class BooksService {
         books.setAuthName(bookreq.getAuthName());
         books.setPrice(bookreq.getPrice());
         books.setCategory(bookreq.getCategory());
-        booksRepository.save(books);
+        booksDao.save(books);
         return ApiResponse.ok("Book Added.", toBookResponse(books));
     }
 
     public ApiResponse<BooksResponse> updateBook(String isbn, BooksRequest bookreq) {
-        Optional<Books> bookOptional = booksRepository.findById(isbn);
-        if(bookOptional.isEmpty())
+        Optional<Books> bookOptional = booksDao.findById(isbn);
+        if (bookOptional.isEmpty())
             return ApiResponse.fail("Book not found.");
         Books existingBook = bookOptional.get();
-        if(!bookreq.getTitle().isBlank())
+        if (!bookreq.getTitle().isBlank())
             existingBook.setTitle(bookreq.getTitle());
-        if(!bookreq.getAuthName().isBlank())
+        if (!bookreq.getAuthName().isBlank())
             existingBook.setAuthName(bookreq.getAuthName());
-        if(bookreq.getEdition() != 0)
+        if (bookreq.getEdition() != 0)
             existingBook.setEdition(bookreq.getEdition());
-        if(!bookreq.getCategory().isBlank())
+        if (!bookreq.getCategory().isBlank())
             existingBook.setCategory(bookreq.getCategory());
-        if(bookreq.getPrice() != 0)
+        if (bookreq.getPrice() != 0)
             existingBook.setPrice(bookreq.getPrice());
-        booksRepository.save(existingBook);
+        booksDao.save(existingBook);
         return ApiResponse.ok("Book updated.", toBookResponse(existingBook));
     }
 
     public ApiResponse<Void> deleteBook(String isbn) {
-        Optional<Books> booksOptional = booksRepository.findById(isbn);
-        if(booksOptional.isEmpty())
+        Optional<Books> booksOptional = booksDao.findById(isbn);
+        if (booksOptional.isEmpty())
             return ApiResponse.fail("Book not found.");
-        booksRepository.deleteById(isbn);
-        return ApiResponse.ok("Book Deleted", null);
-=======
-    public List<Books> getAllBooks() {
-        return booksDao.findAll();
-    }
-
-    public Books getBookByIsbn(String isbn) {
-        return booksDao.findById(isbn);
-    }
-
-    public Books addBook(Books book) {
-        return booksDao.save(book);
-    }
-
-    public Books updateBook(String isbn, Books book) {
-
-        Books existingBook = booksDao.findById(isbn);
-        if (existingBook == null) {
-            return null;
-        }
-
-        existingBook.setTitle(book.getTitle());
-        existingBook.setAuthName(book.getAuthName());
-        existingBook.setPrice(book.getPrice());
-
-        return booksDao.update(existingBook);
-
-    }
-
-    public void deleteBook(String isbn) {
         booksDao.deleteById(isbn);
->>>>>>> ff9746a (Implemented Hibernate CRUD operations for Books)
+        return ApiResponse.ok("Book Deleted", null);
+
     }
 }
