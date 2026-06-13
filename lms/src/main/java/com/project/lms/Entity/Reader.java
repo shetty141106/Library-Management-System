@@ -23,6 +23,9 @@ public class Reader {
 
     @ElementCollection
     private List<String> phones;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Books> books;
 }
 
 

@@ -1,5 +1,6 @@
 package com.project.lms.Dao;
 
+import com.project.lms.Entity.Books;
 import com.project.lms.Entity.Reader;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -18,6 +19,7 @@ public class ReaderDao {
     public ReaderDao() {
         cfg = new Configuration();
         cfg.addAnnotatedClass(Reader.class);
+        cfg.addAnnotatedClass(Books.class);
         sf = cfg.buildSessionFactory();
     }
 
@@ -27,7 +29,7 @@ public class ReaderDao {
         Session s = sf.openSession();
         List<Reader> r = null;
         try {
-            r = s.createQuery("from Reader").list();
+            r = s.createQuery("from com.project.lms.Entity.Reader", Reader.class).list();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -44,14 +46,13 @@ public class ReaderDao {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        } finally {
-            return r;
         }
+        return r;
     }
 
     public Reader save(Reader reader) {
         Session s = sf.openSession();
-        Transaction tr = null;
+        Transaction tr = s.beginTransaction();
         try {
             s.persist(reader);
             tr.commit();

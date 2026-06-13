@@ -20,7 +20,7 @@ public class BooksService {
 
     private BooksResponse toBookResponse(Books books) {
         return new BooksResponse(
-                books.getIsbn(), books.getTitle(), books.getEdition(), books.getAuthName(), books.getPrice(), books.getCategory()
+                books.getIsbn(), books.getTitle(), books.getEdition(), books.getAuthName(), books.getPrice(), books.getCategory(),books.getQuantity()
         );
     }
 
@@ -32,6 +32,18 @@ public class BooksService {
         return ApiResponse.ok("All Books Fetched.", res);
     }
 
+    public ApiResponse<BooksResponse> updateQuantity(BooksRequest books){
+       Optional <Books> book1=booksDao.findById(books.getIsbn());
+       if(book1.isEmpty()){
+           return ApiResponse.fail("No data found");
+       }
+       else
+       {  Books book= book1.get();
+           book.setQuantity(books.getQuantity());
+           booksDao.save(book);
+         return ApiResponse.ok("Quantity Updated successfully",toBookResponse(book));}
+    }
+
     public ApiResponse<BooksResponse> getBookByIsbn(String isbn) {
         Optional<Books> booksOptional = booksDao.findById(isbn);
         if (booksOptional.isEmpty())
@@ -41,7 +53,7 @@ public class BooksService {
     }
 
     public ApiResponse<BooksResponse> addBook(BooksRequest bookreq) {
-        if (bookreq.getAuthName().isBlank() || bookreq.getTitle().isBlank() || bookreq.getIsbn().isBlank() || bookreq.getCategory().isBlank() || bookreq.getPrice() != 0)
+        if (bookreq.getAuthName().isBlank() || bookreq.getTitle().isBlank() || bookreq.getIsbn().isBlank() || bookreq.getCategory().isBlank() || bookreq.getPrice() <= 0)
             return ApiResponse.fail("All fields are required.");
         if (!bookreq.getIsbn().equals(bookreq.getConfirm_isbn()))
             return ApiResponse.fail("Isbn does not match.");

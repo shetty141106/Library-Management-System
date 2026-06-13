@@ -19,9 +19,6 @@ public class BooksController {
     @Autowired
     private BooksService bookService;
 
-    @Autowired
-    private ApiResponse apiResponse;
-
     @GetMapping
     public ResponseEntity<ApiResponse<List<BooksResponse>>> getAllBooks() {
         ApiResponse<List<BooksResponse>> res = bookService.getAllBooks();

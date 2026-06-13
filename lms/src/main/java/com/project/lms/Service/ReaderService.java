@@ -12,6 +12,7 @@ public class ReaderService {
 
     @Autowired
     private ReaderDao readerDao;
+    @Autowired
 
     public List<Reader> getAllReaders() {
         return readerDao.findAll();
@@ -25,10 +26,10 @@ public class ReaderService {
         return readerDao.save(reader);
     }
 
+
     public Reader updateReader(int id, Reader reader) {
 
-        Reader existingReader =
-                readerDao.findById(id);
+        Reader existingReader = readerDao.findById(id);
 
         if (existingReader != null) {
             existingReader.setEmail(reader.getEmail());

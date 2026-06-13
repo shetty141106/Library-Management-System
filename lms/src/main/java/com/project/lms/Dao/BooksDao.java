@@ -1,6 +1,7 @@
 package com.project.lms.Dao;
 
 import com.project.lms.Entity.Books;
+import com.project.lms.Entity.Reader;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -20,6 +21,7 @@ public class BooksDao  {
     public BooksDao(){
         this.cfg=new Configuration();
         cfg.addAnnotatedClass(Books.class);
+        cfg.addAnnotatedClass(Reader.class);
         this.sf=cfg.buildSessionFactory();
     }
 
@@ -57,7 +59,7 @@ public class BooksDao  {
 
         List <Books> books=null;
         try{
-           books= s.createQuery("from Books ", Books.class).list();
+           books= s.createQuery("from com.project.lms.Entity.Books ", Books.class).list();
         }
         catch (Exception e) {
             e.printStackTrace();
