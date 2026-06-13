@@ -1,6 +1,6 @@
 package com.project.lms.Dao;
 
-import com.project.lms.Entity.Staff;
+import com.project.lms.Entity.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -13,13 +13,19 @@ import java.util.Optional;
 @Repository
 public class StaffDao {
 
-    Configuration cfg;
+    Configuration c;
     SessionFactory sf;
 
     public StaffDao() {
-        cfg = new Configuration();
-        cfg.addAnnotatedClass(Staff.class);
-        sf = cfg.buildSessionFactory();
+        c = new Configuration();
+        c.addAnnotatedClass(Reservation.class);
+        c.addAnnotatedClass(Reader.class);
+        c.addAnnotatedClass(Books.class);
+        c.addAnnotatedClass(Report.class);
+        c.addAnnotatedClass(Staff.class);
+        c.addAnnotatedClass(Authentication.class);
+
+        sf = c.buildSessionFactory();
     }
 
     public List<Staff> findAll() {

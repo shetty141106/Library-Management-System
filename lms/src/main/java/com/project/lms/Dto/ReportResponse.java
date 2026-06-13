@@ -1,6 +1,6 @@
 package com.project.lms.Dto;
 
-import com.project.lms.Entity.ReportType;
+import com.project.lms.Entity.ReservationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import lombok.Data;
 public class ReportResponse {
 
     private Long reportId;
-    private ReportType reportType;
+    private ReservationType reportType;
     private Integer reservationId;
     private Integer staffId;
 }

@@ -1,6 +1,6 @@
 package com.project.lms.Dao;
 
-import com.project.lms.Entity.Report;
+import com.project.lms.Entity.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -13,13 +13,18 @@ import java.util.Optional;
 @Repository
 public class ReportDao {
 
-    Configuration cfg;
+    Configuration c;
     SessionFactory sf;
 
     public ReportDao() {
-        cfg = new Configuration();
-        cfg.addAnnotatedClass(Report.class);
-        sf = cfg.buildSessionFactory();
+        c = new Configuration();
+        c.addAnnotatedClass(Reservation.class);
+        c.addAnnotatedClass(Reader.class);
+        c.addAnnotatedClass(Books.class);
+        c.addAnnotatedClass(Report.class);
+        c.addAnnotatedClass(Staff.class);
+        c.addAnnotatedClass(Authentication.class);
+        sf = c.buildSessionFactory();
     }
 
     public List<Report> findAll() {
