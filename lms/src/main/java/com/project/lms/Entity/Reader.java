@@ -2,7 +2,8 @@ package com.project.lms.Entity;
 
 import lombok.*;
 
-import jakarta.persistence.*;
+
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -21,12 +22,10 @@ public class Reader {
     @ElementCollection
     private List<String> phones;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "reader")
     private List<Books> books;
 
     @OneToOne
-    @MapsId
-    @JoinColumn(name = "userId")
     private Authentication authentication;
 
 }

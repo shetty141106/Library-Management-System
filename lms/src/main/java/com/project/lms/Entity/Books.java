@@ -1,9 +1,14 @@
 package com.project.lms.Entity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 @Data
@@ -26,6 +31,9 @@ public class Books {
 
     private int quantity;
 
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne
+    private Books books;
+
+    @ManyToOne
     private Reader reader;
 }
