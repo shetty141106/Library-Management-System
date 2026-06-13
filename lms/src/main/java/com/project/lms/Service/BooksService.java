@@ -34,15 +34,12 @@ public class BooksService {
 
     public ApiResponse<BooksResponse> updateQuantity(BooksRequest books){
        Optional <Books> book1=booksDao.findById(books.getIsbn());
-       if(book1.isEmpty()){
+       if(book1.isEmpty())
            return ApiResponse.fail("No data found");
-       }
-       else
-       {  Books book= book1.get();
-           book.setQuantity(books.getQuantity());
-           booksDao.save(book);
-         return ApiResponse.ok("Quantity Updated successfully",toBookResponse(book));}
-    }
+       Books book= book1.get();
+       book.setQuantity(books.getQuantity());
+       booksDao.save(book);
+       return ApiResponse.ok("Quantity Updated successfully",toBookResponse(book));}
 
     public ApiResponse<BooksResponse> getBookByIsbn(String isbn) {
         Optional<Books> booksOptional = booksDao.findById(isbn);

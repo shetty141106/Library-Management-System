@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4caf10f8-3d63-433b-a6f3-647a2e7eb226" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Configuration/ApplicationConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/AuthDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/ReaderResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/RegisterRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Authentication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lms/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/lms/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Configuration/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Configuration/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/BooksController.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/BooksController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/ReaderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/ReaderController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/ReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/ReaderDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Reader.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Reader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/RefreshToken.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/RefreshToken.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Security/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Security/JwtAuthenticationFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Security/JwtService.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Security/JwtService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/BooksService.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/BooksService.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Atharvsurya&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/shetty141106/Library-Management-System.git&quot;,
+    &quot;accountId&quot;: &quot;6f03f2a8-d06a-4ef5-8939-8f6807521876&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="3F1MbJkwizx8cG2s7m2wVvJKPLv" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "ignore.preview.features.used": "true",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "MavenSettings"
+  },
+  "keyToStringList": {
+    "ChangesTree.GroupingKeys": [
+      "repository"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.project.lms.Security" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="Library-Management-System" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="Library-Management-System" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4caf10f8-3d63-433b-a6f3-647a2e7eb226" name="Changes" comment="" />
+      <created>1781238191362</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1781238191362</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="SHOW_DETAILS_IN_CHANGES" value="false" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

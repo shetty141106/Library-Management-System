@@ -32,7 +32,6 @@ public class ReaderService {
         Reader existingReader = readerDao.findById(id);
 
         if (existingReader != null) {
-            existingReader.setEmail(reader.getEmail());
             existingReader.setName(reader.getName());
             existingReader.setAddress(reader.getAddress());
             existingReader.setPhones(reader.getPhones());

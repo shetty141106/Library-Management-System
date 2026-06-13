@@ -2,7 +2,7 @@ package com.project.lms.Entity;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
@@ -12,10 +12,7 @@ import java.util.List;
 public class Reader {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userId;
-
-    private String email;
+    private Long userId;
 
     private String name;
 
@@ -26,6 +23,12 @@ public class Reader {
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Books> books;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "userId")
+    private Authentication authentication;
+
 }
 
 
