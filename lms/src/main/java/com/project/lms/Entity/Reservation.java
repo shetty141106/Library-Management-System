@@ -3,6 +3,8 @@ package com.project.lms.Entity;
 import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -17,6 +19,9 @@ public class Reservation {
     @ManyToOne
     @JoinColumn(name = "reader_id")
     private Reader reader;
+
+    @OneToMany(mappedBy = "reservation")
+    private List<Report> reports = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "isbn")
