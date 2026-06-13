@@ -5,23 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4caf10f8-3d63-433b-a6f3-647a2e7eb226" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Configuration/ApplicationConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/AuthDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/ReaderResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/RegisterRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Authentication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/AuthService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/lms/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Configuration/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Configuration/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/BooksController.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/BooksController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/ReaderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/ReaderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/ReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/ReaderDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Reader.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Reader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/RefreshToken.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/RefreshToken.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Security/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Security/JwtAuthenticationFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Security/JwtService.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Security/JwtService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/BooksService.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/BooksService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/StaffController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/StaffDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/StaffResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/StaffService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,12 +33,12 @@
     &quot;assignee&quot;: &quot;Atharvsurya&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/shetty141106/Library-Management-System.git&quot;,
-    &quot;accountId&quot;: &quot;6f03f2a8-d06a-4ef5-8939-8f6807521876&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/shetty141106/Library-Management-System.git",
+    "accountId": "17d7f7ed-cf97-4453-9478-6b8eaba40ab8"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
@@ -72,10 +61,11 @@
     "ignore.preview.features.used": "true",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/yash/OneDrive/Desktop/coding/Java IntelliJ/Library-Management-System",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "MavenSettings"
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   },
   "keyToStringList": {
     "ChangesTree.GroupingKeys": [
@@ -87,19 +77,6 @@
     <key name="CreateClassDialog.RecentsKey">
       <recent name="com.project.lms.Security" />
     </key>
-  </component>
-  <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="Library-Management-System" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="Library-Management-System" />
-      <option name="filePath" />
-      <method v="2" />
-    </configuration>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
