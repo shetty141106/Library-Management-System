@@ -1,48 +1,130 @@
 package com.project.lms.Service;
 
+import com.project.lms.Dto.ApiResponse;
+import com.project.lms.Dto.ReaderResponse;
 import com.project.lms.Entity.Reader;
 import com.project.lms.Dao.ReaderDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReaderService {
 
     @Autowired
     private ReaderDao readerDao;
-    @Autowired
 
-    public List<Reader> getAllReaders() {
-        return readerDao.findAll();
+    private ReaderResponse toReaderResponse(Reader reader) {
+        return new ReaderResponse(
+                reader.getName(),
+                reader.getAuthentication().getEmail(),
+                reader.getAuthentication().getPassword(),
+                reader.getAddress(),
+                reader.getPhones()
+        );
     }
 
-    public Reader getReaderById(int id) {
-        return readerDao.findById(id);
-    }
+    public ApiResponse<List<ReaderResponse>> getAllReaders() {
 
-    public Reader addReader(Reader reader) {
-        return readerDao.save(reader);
-    }
+        List<Reader> readers = readerDao.findAll();
 
-
-    public Reader updateReader(int id, Reader reader) {
-
-        Reader existingReader = readerDao.findById(id);
-
-        if (existingReader != null) {
-            existingReader.setName(reader.getName());
-            existingReader.setAddress(reader.getAddress());
-            existingReader.setPhones(reader.getPhones());
-
-            return readerDao.save(existingReader);
+        if (readers.isEmpty()) {
+            return ApiResponse.fail("No readers found.");
         }
 
-        return null;
+        List<ReaderResponse> response =
+                readers.stream()
+                        .map(this::toReaderResponse)
+                        .toList();
+
+        return ApiResponse.ok("All readers fetched.", response);
     }
 
-    public void deleteReader(int id) {
+    public ApiResponse<ReaderResponse> getReaderById(Long id) {
+
+        Optional<Reader> readerOptional = readerDao.findById(id);
+
+        if (readerOptional.isEmpty()) {
+            return ApiResponse.fail("Reader not found.");
+        }
+
+        return ApiResponse.ok(
+                "Reader fetched.",
+                toReaderResponse(readerOptional.get())
+        );
+    }
+
+    public ApiResponse<ReaderResponse> addReader(Reader reader) {
+
+        if (reader.getName() == null || reader.getName().isBlank()) {
+            return ApiResponse.fail("Reader name is required.");
+        }
+
+        Optional<Reader> existingReader =
+                readerDao.findById(reader.getUserId());
+
+        if (existingReader.isPresent()) {
+            return ApiResponse.fail("Reader already exists.");
+        }
+
+        Reader savedReader = readerDao.save(reader);
+
+        return ApiResponse.ok(
+                "Reader added.",
+                toReaderResponse(savedReader)
+        );
+    }
+
+    public ApiResponse<ReaderResponse> updateReader(Long id, Reader reader) {
+
+        Optional<Reader> readerOptional =
+                readerDao.findById(id);
+
+        if (readerOptional.isEmpty()) {
+            return ApiResponse.fail("Reader not found.");
+        }
+
+        Reader existingReader = readerOptional.get();
+
+        if (reader.getName() != null &&
+                !reader.getName().isBlank()) {
+            existingReader.setName(reader.getName());
+        }
+
+        if (reader.getAddress() != null &&
+                !reader.getAddress().isBlank()) {
+            existingReader.setAddress(reader.getAddress());
+        }
+
+        if (reader.getPhones() != null &&
+                !reader.getPhones().isEmpty()) {
+            existingReader.setPhones(reader.getPhones());
+        }
+
+        readerDao.save(existingReader);
+
+        return ApiResponse.ok(
+                "Reader updated.",
+                toReaderResponse(existingReader)
+        );
+    }
+
+    public ApiResponse<Void> deleteReader(Long id) {
+
+        Optional<Reader> readerOptional =
+                readerDao.findById(id);
+
+        if (readerOptional.isEmpty()) {
+            return ApiResponse.fail("Reader not found.");
+        }
+
         readerDao.deleteById(id);
+
+        return ApiResponse.ok(
+                "Reader deleted.",
+                null
+        );
     }
 }

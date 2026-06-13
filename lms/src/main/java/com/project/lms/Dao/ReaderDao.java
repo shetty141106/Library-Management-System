@@ -40,7 +40,7 @@ public class ReaderDao {
         return r;
     }
 
-    public Reader findById(int id) {
+    public Optional<Reader> findById(Long id) {
         Session s = sf.openSession();
         Reader r = null;
         try {
@@ -48,8 +48,10 @@ public class ReaderDao {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            s.close();
         }
-        return r;
+        return Optional.ofNullable(r);
     }
 
     public Reader save(Reader reader) {
@@ -67,7 +69,7 @@ public class ReaderDao {
         return reader;
     }
 
-    public void deleteById(int id) {
+    public void deleteById(Long id) {
         Session s = sf.openSession();
         Transaction tr = s.beginTransaction();
         try {
