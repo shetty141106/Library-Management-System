@@ -14,7 +14,7 @@ public class Publisher {
     private int yearOfPublication;
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany
     private List<Books> books;
 
 }

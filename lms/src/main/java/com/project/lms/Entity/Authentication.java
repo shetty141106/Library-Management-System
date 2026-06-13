@@ -1,6 +1,6 @@
 package com.project.lms.Entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,8 +25,7 @@ public class Authentication implements UserDetails {
     private String email;
     private String password;
 
-    @OneToOne(mappedBy = "authentication", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
+    @OneToOne(mappedBy = "authentication")
     private Reader reader;
 
     @Override
