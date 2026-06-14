@@ -1,8 +1,6 @@
 package com.project.lms.Dao;
 
-import com.project.lms.Entity.Books;
-import com.project.lms.Entity.Reader;
-import com.project.lms.Entity.Reservation;
+import com.project.lms.Entity.*;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Repository;
@@ -16,6 +14,9 @@ public class ReservationDao {
         c.addAnnotatedClass(Reservation.class);
         c.addAnnotatedClass(Reader.class);
         c.addAnnotatedClass(Books.class);
+        c.addAnnotatedClass(Report.class);
+        c.addAnnotatedClass(Staff.class);
+        c.addAnnotatedClass(Authentication.class);
         sf= c.buildSessionFactory();
     }
 

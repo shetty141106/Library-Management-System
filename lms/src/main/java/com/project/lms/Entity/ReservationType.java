@@ -1,6 +1,6 @@
 package com.project.lms.Entity;
 
-public enum ReportType {
+public enum ReservationType {
     ISSUE,
     RETURN
 }

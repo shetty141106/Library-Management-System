@@ -1,5 +1,6 @@
 package com.project.lms.Dao;
 
+import com.project.lms.Entity.Authentication;
 import com.project.lms.Entity.Books;
 import com.project.lms.Entity.Reader;
 import org.hibernate.HibernateException;
@@ -22,6 +23,7 @@ public class BooksDao  {
         this.cfg=new Configuration();
         cfg.addAnnotatedClass(Books.class);
         cfg.addAnnotatedClass(Reader.class);
+        cfg.addAnnotatedClass(Authentication.class);
         this.sf=cfg.buildSessionFactory();
     }
 

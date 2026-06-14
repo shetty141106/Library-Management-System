@@ -16,6 +16,10 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int reservationId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReservationType reportType;
+
     @ManyToOne
     @JoinColumn(name = "reader_id")
     private Reader reader;
