@@ -25,7 +25,7 @@ public class Authentication implements UserDetails {
     private String email;
     private String password;
 
-    @OneToOne(mappedBy = "authentication")
+    @OneToOne(mappedBy = "authentication", cascade = CascadeType.ALL)
     private Reader reader;
 
     @Override

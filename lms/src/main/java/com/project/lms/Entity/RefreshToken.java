@@ -1,11 +1,11 @@
 package com.project.lms.Entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.time.Instant;
 
 @Entity
@@ -29,5 +29,5 @@ public class RefreshToken {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userid", referencedColumnName = "userid")
-    private Reader reader;
+    private Authentication user;
 }

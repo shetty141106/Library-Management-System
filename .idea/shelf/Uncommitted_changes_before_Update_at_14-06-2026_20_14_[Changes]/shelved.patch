@@ -1,0 +1,1799 @@
+Index: lms/src/main/java/com/project/lms/Entity/Authentication.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Entity;\r\n\r\nimport jakarta.persistence.*;\r\nimport lombok.AllArgsConstructor;\r\nimport lombok.Data;\r\nimport lombok.NoArgsConstructor;\r\nimport org.springframework.security.core.GrantedAuthority;\r\nimport org.springframework.security.core.authority.SimpleGrantedAuthority;\r\nimport org.springframework.security.core.userdetails.UserDetails;\r\n\r\nimport java.util.Collection;\r\nimport java.util.List;\r\n\r\n\r\n@Entity\r\n@Data\r\n@NoArgsConstructor\r\n@AllArgsConstructor\r\npublic class Authentication implements UserDetails {\r\n\r\n    @Id\r\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n    private Long userId;\r\n\r\n    private String email;\r\n    private String password;\r\n\r\n    @OneToOne(mappedBy = \"authentication\", cascade = CascadeType.ALL)\r\n    @PrimaryKeyJoinColumn\r\n    private Reader reader;\r\n\r\n    @Override\r\n    public Collection<? extends GrantedAuthority> getAuthorities() {\r\n        return List.of(new SimpleGrantedAuthority(\"ROLE_USER\"));\r\n    }\r\n\r\n    @Override\r\n    public String getUsername() {\r\n        return this.email;\r\n    }\r\n\r\n    @Override\r\n    public boolean isAccountNonExpired() { return true; }\r\n\r\n    @Override\r\n    public boolean isAccountNonLocked() { return true; }\r\n\r\n    @Override\r\n    public boolean isCredentialsNonExpired() { return true; }\r\n\r\n    @Override\r\n    public boolean isEnabled() { return true; }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/Authentication.java b/lms/src/main/java/com/project/lms/Entity/Authentication.java
+--- a/lms/src/main/java/com/project/lms/Entity/Authentication.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Entity/Authentication.java	(date 1781448219217)
+@@ -1,6 +1,6 @@
+ package com.project.lms.Entity;
+ 
+-import jakarta.persistence.*;
++import javax.persistence.*;
+ import lombok.AllArgsConstructor;
+ import lombok.Data;
+ import lombok.NoArgsConstructor;
+@@ -25,8 +25,7 @@
+     private String email;
+     private String password;
+ 
+-    @OneToOne(mappedBy = "authentication", cascade = CascadeType.ALL)
+-    @PrimaryKeyJoinColumn
++    @OneToOne(mappedBy = "authentication")
+     private Reader reader;
+ 
+     @Override
+Index: lms/src/main/java/com/project/lms/Dao/AuthDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Dao;\r\n\r\nimport com.project.lms.Entity.Authentication;\r\n\r\npublic class AuthDao {\r\n    public void save(Authentication auth) {\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Dao/AuthDao.java b/lms/src/main/java/com/project/lms/Dao/AuthDao.java
+--- a/lms/src/main/java/com/project/lms/Dao/AuthDao.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Dao/AuthDao.java	(date 1781448219213)
+@@ -1,8 +1,39 @@
+ package com.project.lms.Dao;
+ 
+ import com.project.lms.Entity.Authentication;
++import com.project.lms.Entity.Books;
++import com.project.lms.Entity.Reader;
++import org.hibernate.Session;
++import org.hibernate.SessionFactory;
++import org.hibernate.Transaction;
++import org.hibernate.cfg.Configuration;
++import org.springframework.stereotype.Repository;
+ 
++@Repository
+ public class AuthDao {
++
++    Configuration c=null;
++    SessionFactory sf=null;
++
++    public AuthDao(){
++        c=new Configuration();
++        c.addAnnotatedClass(Authentication.class);
++        c.addAnnotatedClass(Reader.class);
++        c.addAnnotatedClass(Books.class);
++        sf=c.buildSessionFactory();
++    }
+     public void save(Authentication auth) {
++        Session s = sf.openSession();
++        Transaction tr = s.beginTransaction();
++        try {
++            s.persist(auth);
++            tr.commit();
++        } catch (Exception e) {
++            e.printStackTrace();
++            tr.rollback();
++        }
++        finally {
++            s.close();
++        }
+     }
+ }
+Index: lms/src/main/resources/hibernate.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>hibernate.connection.driver_class=com.mysql.cj.jdbc.Driver\r\nhibernate.connection.url=jdbc:mysql://localhost:3306/LibraryManagement\r\nhibernate.connection.username=root\r\nhibernate.connection.password=root\r\nhibernate.hbm2ddl.auto=update\r\nhibernate.dialect=org.hibernate.dialect.MySQL8Dialect\r\nhibernate.show_sql=true\r\nhibernate.format_sql=true\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>ISO-8859-1
+===================================================================
+diff --git a/lms/src/main/resources/hibernate.properties b/lms/src/main/resources/hibernate.properties
+--- a/lms/src/main/resources/hibernate.properties	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/resources/hibernate.properties	(date 1781448219224)
+@@ -2,7 +2,7 @@
+ hibernate.connection.url=jdbc:mysql://localhost:3306/LibraryManagement
+ hibernate.connection.username=root
+ hibernate.connection.password=root
+-hibernate.hbm2ddl.auto=update
++hibernate.hbm2ddl.auto=create
+ hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+ hibernate.show_sql=true
+ hibernate.format_sql=true
+Index: lms/src/main/java/com/project/lms/Dao/BooksDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Dao;\r\n\r\nimport com.project.lms.Entity.Books;\r\nimport com.project.lms.Entity.Reader;\r\nimport org.hibernate.HibernateException;\r\nimport org.hibernate.Session;\r\nimport org.hibernate.SessionFactory;\r\nimport org.hibernate.Transaction;\r\nimport org.hibernate.cfg.Configuration;\r\nimport org.springframework.stereotype.Repository;\r\n\r\nimport java.util.List;\r\nimport java.util.Optional;\r\n\r\n@Repository\r\npublic class BooksDao  {\r\n\r\n    Configuration cfg=null;\r\n    SessionFactory sf = null;\r\n\r\n    public BooksDao(){\r\n        this.cfg=new Configuration();\r\n        cfg.addAnnotatedClass(Books.class);\r\n        cfg.addAnnotatedClass(Reader.class);\r\n        this.sf=cfg.buildSessionFactory();\r\n    }\r\n\r\n    public Books save(Books book) {\r\n        Session s=sf.openSession();\r\n        boolean flag = false;\r\n        Transaction tr=s.beginTransaction();\r\n        try {\r\n\r\n            s.persist(book);\r\n            flag=true;\r\n        }\r\n        catch (HibernateException e) {\r\n             e.printStackTrace();\r\n        }\r\n        catch (Exception e) {\r\n            e.printStackTrace();\r\n        }\r\n        finally {\r\n            if (flag == true) {\r\n                tr.commit();\r\n            } else {\r\n                tr.rollback();\r\n            }\r\n\r\n            s.close();\r\n\r\n        }\r\n            return book;\r\n\r\n    }\r\n\r\n    public List<Books> findAll() {\r\n        Session s=sf.openSession();\r\n\r\n        List <Books> books=null;\r\n        try{\r\n           books= s.createQuery(\"from com.project.lms.Entity.Books \", Books.class).list();\r\n        }\r\n        catch (Exception e) {\r\n            e.printStackTrace();\r\n        }\r\n        finally {\r\n            s.close();\r\n        }\r\n\r\n\r\n        return books;\r\n\r\n    }\r\n\r\n    public Optional<Books> findById(String isbn) {\r\n        Session s=sf.openSession();\r\n        Books book=null;\r\n        try{\r\n            book = s.find(Books.class,isbn);\r\n        }\r\n        catch (Exception e) {\r\n            e.printStackTrace();\r\n        }\r\n       finally {\r\n            s.close();\r\n        }\r\n        return Optional.ofNullable(book);\r\n    }\r\n\r\n    public void deleteById(String isbn) {\r\n        Session s = sf.openSession();\r\n        Transaction tr = s.beginTransaction();\r\n        try {\r\n            Books book = s.find(Books.class, isbn);\r\n            if (book == null) {\r\n                System.out.println(\"No data found\");\r\n                tr.rollback();\r\n            }\r\n            else {\r\n                s.remove(book);\r\n                tr.commit();\r\n            }\r\n        }\r\n\r\n        catch (Exception e) {\r\n            tr.rollback();\r\n            e.printStackTrace();\r\n        }\r\n        finally {\r\n            s.close();\r\n        }\r\n    }\r\n\r\n    public Books update(Books existingBook) {\r\n       Session s= sf.openSession();\r\n       Transaction tr=s.beginTransaction();\r\n       try{\r\n           s.merge(existingBook);\r\n           tr.commit();\r\n       } catch (Exception e) {\r\n           e.printStackTrace();\r\n           tr.rollback();\r\n           return null;\r\n       }\r\n       finally {\r\n           s.close();\r\n       }\r\n       return existingBook;\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Dao/BooksDao.java b/lms/src/main/java/com/project/lms/Dao/BooksDao.java
+--- a/lms/src/main/java/com/project/lms/Dao/BooksDao.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Dao/BooksDao.java	(date 1781448219215)
+@@ -1,5 +1,6 @@
+ package com.project.lms.Dao;
+ 
++import com.project.lms.Entity.Authentication;
+ import com.project.lms.Entity.Books;
+ import com.project.lms.Entity.Reader;
+ import org.hibernate.HibernateException;
+@@ -22,6 +23,7 @@
+         this.cfg=new Configuration();
+         cfg.addAnnotatedClass(Books.class);
+         cfg.addAnnotatedClass(Reader.class);
++        cfg.addAnnotatedClass(Authentication.class);
+         this.sf=cfg.buildSessionFactory();
+     }
+ 
+Index: lms/src/main/java/com/project/lms/Dao/ReaderDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Dao;\r\n\r\nimport com.project.lms.Entity.Books;\r\nimport com.project.lms.Entity.Reader;\r\nimport org.hibernate.Session;\r\nimport org.hibernate.SessionFactory;\r\nimport org.hibernate.Transaction;\r\nimport org.hibernate.cfg.Configuration;\r\nimport org.springframework.security.core.userdetails.UserDetailsService;\r\nimport org.springframework.stereotype.Repository;\r\n\r\nimport java.util.List;\r\nimport java.util.Optional;\r\n\r\n@Repository\r\npublic class ReaderDao {\r\n\r\n    Configuration cfg = null;\r\n    SessionFactory sf = null;\r\n\r\n    public ReaderDao() {\r\n        cfg = new Configuration();\r\n        cfg.addAnnotatedClass(Reader.class);\r\n        cfg.addAnnotatedClass(Books.class);\r\n        sf = cfg.buildSessionFactory();\r\n    }\r\n\r\n\r\n    public List<Reader> findAll() {\r\n\r\n        Session s = sf.openSession();\r\n        List<Reader> r = null;\r\n        try {\r\n            r = s.createQuery(\"from com.project.lms.Entity.Reader\", Reader.class).list();\r\n        } catch (Exception e) {\r\n            e.printStackTrace();\r\n        } finally {\r\n            s.close();\r\n        }\r\n        return r;\r\n    }\r\n\r\n    public Reader findById(int id) {\r\n        Session s = sf.openSession();\r\n        Reader r = null;\r\n        try {\r\n            r = s.find(Reader.class, id);\r\n        } catch (Exception e) {\r\n            e.printStackTrace();\r\n            return null;\r\n        }\r\n        return r;\r\n    }\r\n\r\n    public Reader save(Reader reader) {\r\n        Session s = sf.openSession();\r\n        Transaction tr = s.beginTransaction();\r\n        try {\r\n            s.persist(reader);\r\n            tr.commit();\r\n        } catch (Exception e) {\r\n            e.printStackTrace();\r\n            tr.rollback();\r\n        } finally {\r\n            s.close();\r\n        }\r\n        return reader;\r\n    }\r\n\r\n    public void deleteById(int id) {\r\n        Session s = sf.openSession();\r\n        Transaction tr = s.beginTransaction();\r\n        try {\r\n            Reader r = s.find(Reader.class, id);\r\n            if (r == null) {\r\n                System.out.println(\"no data found\");\r\n                tr.rollback();\r\n            } else {\r\n                s.remove(r);\r\n                tr.commit();\r\n            }\r\n        } catch (Exception e) {\r\n            e.printStackTrace();\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Dao/ReaderDao.java b/lms/src/main/java/com/project/lms/Dao/ReaderDao.java
+--- a/lms/src/main/java/com/project/lms/Dao/ReaderDao.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Dao/ReaderDao.java	(date 1781448219215)
+@@ -1,5 +1,6 @@
+ package com.project.lms.Dao;
+ 
++import com.project.lms.Entity.Authentication;
+ import com.project.lms.Entity.Books;
+ import com.project.lms.Entity.Reader;
+ import org.hibernate.Session;
+@@ -22,6 +23,7 @@
+         cfg = new Configuration();
+         cfg.addAnnotatedClass(Reader.class);
+         cfg.addAnnotatedClass(Books.class);
++        cfg.addAnnotatedClass(Authentication.class);
+         sf = cfg.buildSessionFactory();
+     }
+ 
+@@ -40,7 +42,7 @@
+         return r;
+     }
+ 
+-    public Reader findById(int id) {
++    public Optional<Reader> findById(Long id) {
+         Session s = sf.openSession();
+         Reader r = null;
+         try {
+@@ -48,8 +50,10 @@
+         } catch (Exception e) {
+             e.printStackTrace();
+             return null;
++        } finally {
++            s.close();
+         }
+-        return r;
++        return Optional.ofNullable(r);
+     }
+ 
+     public Reader save(Reader reader) {
+@@ -67,7 +71,7 @@
+         return reader;
+     }
+ 
+-    public void deleteById(int id) {
++    public void deleteById(Long id) {
+         Session s = sf.openSession();
+         Transaction tr = s.beginTransaction();
+         try {
+Index: lms/src/main/java/com/project/lms/Service/BooksService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Service;\r\n\r\n\r\nimport com.project.lms.Dto.ApiResponse;\r\nimport com.project.lms.Dto.BooksRequest;\r\nimport com.project.lms.Dto.BooksResponse;\r\nimport com.project.lms.Entity.Books;\r\nimport com.project.lms.Dao.BooksDao;\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.stereotype.Service;\r\n\r\nimport java.util.List;\r\nimport java.util.Optional;\r\n\r\n@Service\r\npublic class BooksService {\r\n\r\n    @Autowired\r\n    private BooksDao booksDao;\r\n\r\n    private BooksResponse toBookResponse(Books books) {\r\n        return new BooksResponse(\r\n                books.getIsbn(), books.getTitle(), books.getEdition(), books.getAuthName(), books.getPrice(), books.getCategory(),books.getQuantity()\r\n        );\r\n    }\r\n\r\n    public ApiResponse<List<BooksResponse>> getAllBooks() {\r\n        List<Books> books = booksDao.findAll();\r\n        if (books.isEmpty())\r\n            return ApiResponse.fail(\"No books available currently.\");\r\n        List<BooksResponse> res = books.stream().map(this::toBookResponse).toList();\r\n        return ApiResponse.ok(\"All Books Fetched.\", res);\r\n    }\r\n\r\n    public ApiResponse<BooksResponse> updateQuantity(BooksRequest books){\r\n       Optional <Books> book1=booksDao.findById(books.getIsbn());\r\n       if(book1.isEmpty())\r\n           return ApiResponse.fail(\"No data found\");\r\n       Books book= book1.get();\r\n       book.setQuantity(books.getQuantity());\r\n       booksDao.save(book);\r\n       return ApiResponse.ok(\"Quantity Updated successfully\",toBookResponse(book));}\r\n\r\n    public ApiResponse<BooksResponse> getBookByIsbn(String isbn) {\r\n        Optional<Books> booksOptional = booksDao.findById(isbn);\r\n        if (booksOptional.isEmpty())\r\n            return ApiResponse.fail(\"Book not found.\");\r\n        Books books = booksOptional.get();\r\n        return ApiResponse.ok(\"Book Fetched.\", toBookResponse(books));\r\n    }\r\n\r\n    public ApiResponse<BooksResponse> addBook(BooksRequest bookreq) {\r\n        if (bookreq.getAuthName().isBlank() || bookreq.getTitle().isBlank() || bookreq.getIsbn().isBlank() || bookreq.getCategory().isBlank() || bookreq.getPrice() <= 0)\r\n            return ApiResponse.fail(\"All fields are required.\");\r\n        if (!bookreq.getIsbn().equals(bookreq.getConfirm_isbn()))\r\n            return ApiResponse.fail(\"Isbn does not match.\");\r\n        Optional<Books> booksOptional = booksDao.findById(bookreq.getIsbn());\r\n        if (booksOptional.isPresent())\r\n            return ApiResponse.fail(\"Book with this Isbn already exists.\");\r\n        Books books = new Books();\r\n        books.setIsbn(bookreq.getIsbn());\r\n        books.setTitle(bookreq.getTitle());\r\n        books.setEdition(bookreq.getEdition());\r\n        books.setAuthName(bookreq.getAuthName());\r\n        books.setPrice(bookreq.getPrice());\r\n        books.setCategory(bookreq.getCategory());\r\n        booksDao.save(books);\r\n        return ApiResponse.ok(\"Book Added.\", toBookResponse(books));\r\n    }\r\n\r\n    public ApiResponse<BooksResponse> updateBook(String isbn, BooksRequest bookreq) {\r\n        Optional<Books> bookOptional = booksDao.findById(isbn);\r\n        if (bookOptional.isEmpty())\r\n            return ApiResponse.fail(\"Book not found.\");\r\n        Books existingBook = bookOptional.get();\r\n        if (!bookreq.getTitle().isBlank())\r\n            existingBook.setTitle(bookreq.getTitle());\r\n        if (!bookreq.getAuthName().isBlank())\r\n            existingBook.setAuthName(bookreq.getAuthName());\r\n        if (bookreq.getEdition() != 0)\r\n            existingBook.setEdition(bookreq.getEdition());\r\n        if (!bookreq.getCategory().isBlank())\r\n            existingBook.setCategory(bookreq.getCategory());\r\n        if (bookreq.getPrice() != 0)\r\n            existingBook.setPrice(bookreq.getPrice());\r\n        booksDao.save(existingBook);\r\n        return ApiResponse.ok(\"Book updated.\", toBookResponse(existingBook));\r\n    }\r\n\r\n    public ApiResponse<Void> deleteBook(String isbn) {\r\n        Optional<Books> booksOptional = booksDao.findById(isbn);\r\n        if (booksOptional.isEmpty())\r\n            return ApiResponse.fail(\"Book not found.\");\r\n        booksDao.deleteById(isbn);\r\n        return ApiResponse.ok(\"Book Deleted\", null);\r\n\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Service/BooksService.java b/lms/src/main/java/com/project/lms/Service/BooksService.java
+--- a/lms/src/main/java/com/project/lms/Service/BooksService.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Service/BooksService.java	(date 1781448219219)
+@@ -1,6 +1,5 @@
+ package com.project.lms.Service;
+ 
+-
+ import com.project.lms.Dto.ApiResponse;
+ import com.project.lms.Dto.BooksRequest;
+ import com.project.lms.Dto.BooksResponse;
+Index: lms/src/main/java/com/project/lms/Entity/Books.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Entity;\r\nimport lombok.AllArgsConstructor;\r\nimport lombok.Data;\r\nimport lombok.NoArgsConstructor;\r\n\r\nimport javax.persistence.*;\r\n\r\n@Entity\r\n@Data\r\n@NoArgsConstructor\r\n@AllArgsConstructor\r\npublic class Books {\r\n\r\n    @Id\r\n    private String isbn;\r\n\r\n    private String title;\r\n\r\n    private int edition;\r\n\r\n    private String authName;\r\n\r\n    private double price;\r\n\r\n    private String category;\r\n\r\n    private int quantity;\r\n\r\n    @ManyToOne(cascade=CascadeType.ALL)\r\n    private Reader reader;\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/Books.java b/lms/src/main/java/com/project/lms/Entity/Books.java
+--- a/lms/src/main/java/com/project/lms/Entity/Books.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Entity/Books.java	(date 1781448219217)
+@@ -1,9 +1,14 @@
+ package com.project.lms.Entity;
++
+ import lombok.AllArgsConstructor;
+ import lombok.Data;
+ import lombok.NoArgsConstructor;
+ 
+-import javax.persistence.*;
++
++import javax.persistence.CascadeType;
++import javax.persistence.Entity;
++import javax.persistence.Id;
++import javax.persistence.ManyToOne;
+ 
+ @Entity
+ @Data
+@@ -26,6 +31,9 @@
+ 
+     private int quantity;
+ 
+-    @ManyToOne(cascade=CascadeType.ALL)
++    @ManyToOne
++    private Books books;
++
++    @ManyToOne
+     private Reader reader;
+ }
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Configuration/ApplicationConfig.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Configuration;\r\n\r\nimport lombok.RequiredArgsConstructor;\r\nimport org.springframework.context.annotation.Bean;\r\nimport org.springframework.context.annotation.Configuration;\r\nimport org.springframework.security.authentication.AuthenticationProvider;\r\nimport org.springframework.security.authentication.dao.DaoAuthenticationProvider;\r\nimport org.springframework.security.core.userdetails.UserDetailsService;\r\nimport org.springframework.security.core.userdetails.UsernameNotFoundException;\r\n\r\n\r\n@Configuration\r\n@RequiredArgsConstructor\r\npublic class ApplicationConfig {\r\n\r\n    private final ;\r\n\r\n    @Bean\r\n    public UserDetailsService userDetailsService() {\r\n        return username -> readerDao.findByEmail(username)\r\n                .orElseThrow(() -> new UsernameNotFoundException(\"User not found\"));\r\n    }\r\n\r\n    @Bean\r\n    public AuthenticationProvider authenticationProvider() {\r\n        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();\r\n        authProvider.setUserDetailsService(userDetailsService());\r\n        authProvider.setPasswordEncoder(passwordEncoder());\r\n        return authProvider;\r\n    }\r\n\r\n    @Bean\r\n    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {\r\n        return config.getAuthenticationManager();\r\n    }\r\n\r\n    @Bean\r\n    public PasswordEncoder passwordEncoder() {\r\n        return new BCryptPasswordEncoder();\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Configuration/ApplicationConfig.java b/lms/src/main/java/com/project/lms/Configuration/ApplicationConfig.java
+--- a/lms/src/main/java/com/project/lms/Configuration/ApplicationConfig.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Configuration/ApplicationConfig.java	(date 1781448219211)
+@@ -1,41 +1,50 @@
+-package com.project.lms.Configuration;
+-
+-import lombok.RequiredArgsConstructor;
+-import org.springframework.context.annotation.Bean;
+-import org.springframework.context.annotation.Configuration;
+-import org.springframework.security.authentication.AuthenticationProvider;
+-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+-import org.springframework.security.core.userdetails.UserDetailsService;
+-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+-
+-
+-@Configuration
+-@RequiredArgsConstructor
+-public class ApplicationConfig {
+-
+-    private final ;
+-
+-    @Bean
+-    public UserDetailsService userDetailsService() {
+-        return username -> readerDao.findByEmail(username)
+-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+-    }
+-
+-    @Bean
+-    public AuthenticationProvider authenticationProvider() {
+-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+-        authProvider.setUserDetailsService(userDetailsService());
+-        authProvider.setPasswordEncoder(passwordEncoder());
+-        return authProvider;
+-    }
+-
+-    @Bean
+-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+-        return config.getAuthenticationManager();
+-    }
+-
+-    @Bean
+-    public PasswordEncoder passwordEncoder() {
+-        return new BCryptPasswordEncoder();
+-    }
+-}
+\ No newline at end of file
++//package com.project.lms.Configuration;
++//
++//import com.project.lms.Dao.ReaderDao;
++//import lombok.RequiredArgsConstructor;
++//import org.springframework.beans.factory.annotation.Autowired;
++//import org.springframework.context.annotation.Bean;
++//import org.springframework.context.annotation.Configuration;
++//import org.springframework.security.authentication.AuthenticationManager;
++//import org.springframework.security.authentication.AuthenticationProvider;
++//import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
++//import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
++//import org.springframework.security.core.userdetails.UserDetailsService;
++//import org.springframework.security.core.userdetails.UsernameNotFoundException;
++//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
++//import org.springframework.security.crypto.password.PasswordEncoder;
++//
++//
++//@Configuration
++//@RequiredArgsConstructor
++//public class ApplicationConfig {
++//
++//    private final ;
++//
++//    @Autowired
++//    ReaderDao readerDao;
++//
++//    @Bean
++//    public UserDetailsService userDetailsService() {
++//        return username -> readerDao.findByEmail(username)
++//                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
++//    }
++//
++//    @Bean
++//    public AuthenticationProvider authenticationProvider() {
++//        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
++//        authProvider.setUserDetailsService(userDetailsService());
++//        authProvider.setPasswordEncoder(passwordEncoder());
++//        return authProvider;
++//    }
++//
++//    @Bean
++//    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
++//        return config.getAuthenticationManager();
++//    }
++//
++//    @Bean
++//    public PasswordEncoder passwordEncoder() {
++//        return new BCryptPasswordEncoder();
++//    }
++//}
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Entity/Reader.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Entity;\r\n\r\nimport lombok.*;\r\n\r\nimport jakarta.persistence.*;\r\nimport java.util.List;\r\n\r\n@Entity\r\n@Data\r\n@NoArgsConstructor\r\n@AllArgsConstructor\r\npublic class Reader {\r\n\r\n    @Id\r\n    private Long userId;\r\n\r\n    private String name;\r\n\r\n    private String address;\r\n\r\n    @ElementCollection\r\n    private List<String> phones;\r\n\r\n    @OneToMany(cascade = CascadeType.ALL)\r\n    private List<Books> books;\r\n\r\n    @OneToOne\r\n    @MapsId\r\n    @JoinColumn(name = \"userId\")\r\n    private Authentication authentication;\r\n\r\n}\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/Reader.java b/lms/src/main/java/com/project/lms/Entity/Reader.java
+--- a/lms/src/main/java/com/project/lms/Entity/Reader.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Entity/Reader.java	(date 1781448219219)
+@@ -2,7 +2,8 @@
+ 
+ import lombok.*;
+ 
+-import jakarta.persistence.*;
++
++import javax.persistence.*;
+ import java.util.List;
+ 
+ @Entity
+@@ -21,12 +22,10 @@
+     @ElementCollection
+     private List<String> phones;
+ 
+-    @OneToMany(cascade = CascadeType.ALL)
++    @OneToMany(mappedBy = "reader")
+     private List<Books> books;
+ 
+     @OneToOne
+-    @MapsId
+-    @JoinColumn(name = "userId")
+     private Authentication authentication;
+ 
+ }
+Index: lms/src/main/java/com/project/lms/Service/ReaderService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Service;\r\n\r\nimport com.project.lms.Entity.Reader;\r\nimport com.project.lms.Dao.ReaderDao;\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.stereotype.Service;\r\n\r\nimport java.util.List;\r\n\r\n@Service\r\npublic class ReaderService {\r\n\r\n    @Autowired\r\n    private ReaderDao readerDao;\r\n    @Autowired\r\n\r\n    public List<Reader> getAllReaders() {\r\n        return readerDao.findAll();\r\n    }\r\n\r\n    public Reader getReaderById(int id) {\r\n        return readerDao.findById(id);\r\n    }\r\n\r\n    public Reader addReader(Reader reader) {\r\n        return readerDao.save(reader);\r\n    }\r\n\r\n\r\n    public Reader updateReader(int id, Reader reader) {\r\n\r\n        Reader existingReader = readerDao.findById(id);\r\n\r\n        if (existingReader != null) {\r\n            existingReader.setName(reader.getName());\r\n            existingReader.setAddress(reader.getAddress());\r\n            existingReader.setPhones(reader.getPhones());\r\n\r\n            return readerDao.save(existingReader);\r\n        }\r\n\r\n        return null;\r\n    }\r\n\r\n    public void deleteReader(int id) {\r\n        readerDao.deleteById(id);\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Service/ReaderService.java b/lms/src/main/java/com/project/lms/Service/ReaderService.java
+--- a/lms/src/main/java/com/project/lms/Service/ReaderService.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Service/ReaderService.java	(date 1781448219222)
+@@ -1,48 +1,130 @@
+ package com.project.lms.Service;
+ 
++import com.project.lms.Dto.ApiResponse;
++import com.project.lms.Dto.ReaderResponse;
+ import com.project.lms.Entity.Reader;
+ import com.project.lms.Dao.ReaderDao;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.stereotype.Service;
+ 
+ import java.util.List;
++import java.util.Optional;
+ 
+ @Service
+ public class ReaderService {
+ 
+     @Autowired
+     private ReaderDao readerDao;
+-    @Autowired
++
++    private ReaderResponse toReaderResponse(Reader reader) {
++        return new ReaderResponse(
++                reader.getName(),
++                reader.getAuthentication().getEmail(),
++                reader.getAuthentication().getPassword(),
++                reader.getAddress(),
++                reader.getPhones()
++        );
++    }
++
++    public ApiResponse<List<ReaderResponse>> getAllReaders() {
++
++        List<Reader> readers = readerDao.findAll();
++
++        if (readers.isEmpty()) {
++            return ApiResponse.fail("No readers found.");
++        }
++
++        List<ReaderResponse> response =
++                readers.stream()
++                        .map(this::toReaderResponse)
++                        .toList();
++
++        return ApiResponse.ok("All readers fetched.", response);
++    }
++
++    public ApiResponse<ReaderResponse> getReaderById(Long id) {
++
++        Optional<Reader> readerOptional = readerDao.findById(id);
++
++        if (readerOptional.isEmpty()) {
++            return ApiResponse.fail("Reader not found.");
++        }
++
++        return ApiResponse.ok(
++                "Reader fetched.",
++                toReaderResponse(readerOptional.get())
++        );
++    }
++
++    public ApiResponse<ReaderResponse> addReader(Reader reader) {
+ 
+-    public List<Reader> getAllReaders() {
+-        return readerDao.findAll();
+-    }
++        if (reader.getName() == null || reader.getName().isBlank()) {
++            return ApiResponse.fail("Reader name is required.");
++        }
+ 
+-    public Reader getReaderById(int id) {
+-        return readerDao.findById(id);
+-    }
++        Optional<Reader> existingReader =
++                readerDao.findById(reader.getUserId());
++
++        if (existingReader.isPresent()) {
++            return ApiResponse.fail("Reader already exists.");
++        }
+ 
+-    public Reader addReader(Reader reader) {
+-        return readerDao.save(reader);
++        Reader savedReader = readerDao.save(reader);
++
++        return ApiResponse.ok(
++                "Reader added.",
++                toReaderResponse(savedReader)
++        );
+     }
+ 
++    public ApiResponse<ReaderResponse> updateReader(Long id, Reader reader) {
+ 
+-    public Reader updateReader(int id, Reader reader) {
++        Optional<Reader> readerOptional =
++                readerDao.findById(id);
+ 
+-        Reader existingReader = readerDao.findById(id);
++        if (readerOptional.isEmpty()) {
++            return ApiResponse.fail("Reader not found.");
++        }
+ 
+-        if (existingReader != null) {
++        Reader existingReader = readerOptional.get();
++
++        if (reader.getName() != null &&
++                !reader.getName().isBlank()) {
+             existingReader.setName(reader.getName());
++        }
++
++        if (reader.getAddress() != null &&
++                !reader.getAddress().isBlank()) {
+             existingReader.setAddress(reader.getAddress());
++        }
++
++        if (reader.getPhones() != null &&
++                !reader.getPhones().isEmpty()) {
+             existingReader.setPhones(reader.getPhones());
++        }
++
++        readerDao.save(existingReader);
+ 
+-            return readerDao.save(existingReader);
+-        }
++        return ApiResponse.ok(
++                "Reader updated.",
++                toReaderResponse(existingReader)
++        );
++    }
+ 
+-        return null;
+-    }
++    public ApiResponse<Void> deleteReader(Long id) {
++
++        Optional<Reader> readerOptional =
++                readerDao.findById(id);
++
++        if (readerOptional.isEmpty()) {
++            return ApiResponse.fail("Reader not found.");
++        }
+ 
+-    public void deleteReader(int id) {
+         readerDao.deleteById(id);
++
++        return ApiResponse.ok(
++                "Reader deleted.",
++                null
++        );
+     }
+ }
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Entity/Reservation.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Entity;\r\n\r\nimport lombok.*;\r\nimport javax.persistence.*;\r\nimport java.time.LocalDate;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\n@Entity\r\n@Data\r\n@NoArgsConstructor\r\n@AllArgsConstructor\r\npublic class Reservation {\r\n\r\n    @Id\r\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n    private int reservationId;\r\n\r\n    @ManyToOne\r\n    @JoinColumn(name = \"reader_id\")\r\n    private Reader reader;\r\n\r\n    @OneToMany(mappedBy = \"reservation\")\r\n    private List<Report> reports = new ArrayList<>();\r\n\r\n    @ManyToOne\r\n    @JoinColumn(name = \"isbn\")\r\n    private Books book;\r\n\r\n    private LocalDate issueDate;\r\n\r\n    private LocalDate dueDate;\r\n\r\n    private LocalDate returnDate;\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/Reservation.java b/lms/src/main/java/com/project/lms/Entity/Reservation.java
+--- a/lms/src/main/java/com/project/lms/Entity/Reservation.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Entity/Reservation.java	(date 1781448219219)
+@@ -16,6 +16,10 @@
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+     private int reservationId;
+ 
++    @Enumerated(EnumType.STRING)
++    @Column(nullable = false)
++    private ReservationType reportType;
++
+     @ManyToOne
+     @JoinColumn(name = "reader_id")
+     private Reader reader;
+Index: lms/src/main/java/com/project/lms/Controller/ReaderController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Controller;\r\n\r\nimport com.project.lms.Entity.Reader;\r\nimport com.project.lms.Service.ReaderService;\r\n\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.web.bind.annotation.*;\r\n\r\nimport java.util.List;\r\n\r\n@RestController\r\n@RequestMapping(\"/api/readers\")\r\npublic class ReaderController {\r\n\r\n    @Autowired\r\n    private ReaderService readerService;\r\n\r\n    @GetMapping\r\n    public List<Reader> getAllReaders() {\r\n        return readerService.getAllReaders();\r\n    }\r\n\r\n    @GetMapping(\"/{id}\")\r\n    public Reader getReaderById(@PathVariable int id) {\r\n        return readerService.getReaderById(id);\r\n    }\r\n\r\n    @PostMapping\r\n    public Reader addReader(@RequestBody Reader reader) {\r\n        return readerService.addReader(reader);\r\n    }\r\n\r\n    @PutMapping(\"/{id}\")\r\n    public Reader updateReader(@PathVariable int id,\r\n                               @RequestBody Reader reader) {\r\n        return readerService.updateReader(id, reader);\r\n    }\r\n\r\n    @DeleteMapping(\"/{id}\")\r\n    public String deleteReader(@PathVariable int id) {\r\n        readerService.deleteReader(id);\r\n        return \"Reader deleted successfully\";\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Controller/ReaderController.java b/lms/src/main/java/com/project/lms/Controller/ReaderController.java
+--- a/lms/src/main/java/com/project/lms/Controller/ReaderController.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Controller/ReaderController.java	(date 1781448219213)
+@@ -1,9 +1,12 @@
+ package com.project.lms.Controller;
+ 
++import com.project.lms.Dto.ApiResponse;
++import com.project.lms.Dto.ReaderResponse;
+ import com.project.lms.Entity.Reader;
+ import com.project.lms.Service.ReaderService;
+ 
+ import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.http.ResponseEntity;
+ import org.springframework.web.bind.annotation.*;
+ 
+ import java.util.List;
+@@ -16,29 +19,62 @@
+     private ReaderService readerService;
+ 
+     @GetMapping
+-    public List<Reader> getAllReaders() {
+-        return readerService.getAllReaders();
++    public ResponseEntity<ApiResponse<List<ReaderResponse>>> getAllReaders() {
++
++        ApiResponse<List<ReaderResponse>> res =
++                readerService.getAllReaders();
++
++        return res.isSuccess()
++                ? ResponseEntity.ok(res)
++                : ResponseEntity.badRequest().body(res);
+     }
+ 
+     @GetMapping("/{id}")
+-    public Reader getReaderById(@PathVariable int id) {
+-        return readerService.getReaderById(id);
++    public ResponseEntity<ApiResponse<ReaderResponse>> getReaderById(
++            @PathVariable Long id) {
++
++        ApiResponse<ReaderResponse> res =
++                readerService.getReaderById(id);
++
++        return res.isSuccess()
++                ? ResponseEntity.ok(res)
++                : ResponseEntity.badRequest().body(res);
+     }
+ 
+     @PostMapping
+-    public Reader addReader(@RequestBody Reader reader) {
+-        return readerService.addReader(reader);
++    public ResponseEntity<ApiResponse<ReaderResponse>> addReader(
++            @RequestBody Reader reader) {
++
++        ApiResponse<ReaderResponse> res =
++                readerService.addReader(reader);
++
++        return res.isSuccess()
++                ? ResponseEntity.ok(res)
++                : ResponseEntity.badRequest().body(res);
+     }
+ 
+     @PutMapping("/{id}")
+-    public Reader updateReader(@PathVariable int id,
+-                               @RequestBody Reader reader) {
+-        return readerService.updateReader(id, reader);
++    public ResponseEntity<ApiResponse<ReaderResponse>> updateReader(
++            @PathVariable Long id,
++            @RequestBody Reader reader) {
++
++        ApiResponse<ReaderResponse> res =
++                readerService.updateReader(id, reader);
++
++        return res.isSuccess()
++                ? ResponseEntity.ok(res)
++                : ResponseEntity.badRequest().body(res);
+     }
+ 
+     @DeleteMapping("/{id}")
+-    public String deleteReader(@PathVariable int id) {
+-        readerService.deleteReader(id);
+-        return "Reader deleted successfully";
++    public ResponseEntity<ApiResponse<Void>> deleteReader(
++            @PathVariable Long id) {
++
++        ApiResponse<Void> res =
++                readerService.deleteReader(id);
++
++        return res.isSuccess()
++                ? ResponseEntity.ok(res)
++                : ResponseEntity.badRequest().body(res);
+     }
+ }
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Dao/ReservationDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Dao;\r\n\r\nimport com.project.lms.Entity.Books;\r\nimport com.project.lms.Entity.Reader;\r\nimport com.project.lms.Entity.Reservation;\r\nimport org.hibernate.SessionFactory;\r\nimport org.hibernate.cfg.Configuration;\r\nimport org.springframework.stereotype.Repository;\r\n\r\n@Repository\r\npublic class ReservationDao {\r\n    Configuration c=null;\r\n    SessionFactory sf=null;\r\n    public ReservationDao(){\r\n        c=new Configuration();\r\n        c.addAnnotatedClass(Reservation.class);\r\n        c.addAnnotatedClass(Reader.class);\r\n        c.addAnnotatedClass(Books.class);\r\n        sf= c.buildSessionFactory();\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Dao/ReservationDao.java b/lms/src/main/java/com/project/lms/Dao/ReservationDao.java
+--- a/lms/src/main/java/com/project/lms/Dao/ReservationDao.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Dao/ReservationDao.java	(date 1781448219215)
+@@ -1,8 +1,6 @@
+ package com.project.lms.Dao;
+ 
+-import com.project.lms.Entity.Books;
+-import com.project.lms.Entity.Reader;
+-import com.project.lms.Entity.Reservation;
++import com.project.lms.Entity.*;
+ import org.hibernate.SessionFactory;
+ import org.hibernate.cfg.Configuration;
+ import org.springframework.stereotype.Repository;
+@@ -16,6 +14,9 @@
+         c.addAnnotatedClass(Reservation.class);
+         c.addAnnotatedClass(Reader.class);
+         c.addAnnotatedClass(Books.class);
++        c.addAnnotatedClass(Report.class);
++        c.addAnnotatedClass(Staff.class);
++        c.addAnnotatedClass(Authentication.class);
+         sf= c.buildSessionFactory();
+     }
+ 
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\r\n  <component name=\"MavenProjectsManager\">\r\n    <option name=\"originalFiles\">\r\n      <list>\r\n        <option value=\"$PROJECT_DIR$/lms/pom.xml\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_25\" />\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/.idea/misc.xml	(date 1781448219204)
+@@ -8,5 +8,7 @@
+       </list>
+     </option>
+   </component>
+-  <component name="ProjectRootManager" version="2" languageLevel="JDK_25" />
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_24" default="true" project-jdk-name="24" project-jdk-type="JavaSDK">
++    <output url="file://$PROJECT_DIR$/out" />
++  </component>
+ </project>
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Entity/Staff.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Entity;\r\n\r\nimport javax.persistence.Entity;\r\nimport javax.persistence.Id;\r\nimport javax.persistence.OneToMany;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\n@Entity\r\npublic class Staff {\r\n    @Id\r\n    private int staff_id;\r\n    private Staff name;\r\n\r\n    @OneToMany(mappedBy = \"staff\")\r\n    private List<Report> reports = new ArrayList<>();\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/Staff.java b/lms/src/main/java/com/project/lms/Entity/Staff.java
+--- a/lms/src/main/java/com/project/lms/Entity/Staff.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Entity/Staff.java	(date 1781448219219)
+@@ -1,16 +1,18 @@
+ package com.project.lms.Entity;
+ 
++import lombok.Data;
++
+ import javax.persistence.Entity;
+ import javax.persistence.Id;
+ import javax.persistence.OneToMany;
+ import java.util.ArrayList;
+ import java.util.List;
+-
++@Data
+ @Entity
+ public class Staff {
+     @Id
+     private int staff_id;
+-    private Staff name;
++    private String name;
+ 
+     @OneToMany(mappedBy = "staff")
+     private List<Report> reports = new ArrayList<>();
+Index: lms/src/main/java/com/project/lms/Entity/Report.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Entity;\r\n\r\nimport com.project.lms.Entity.ReportType;\r\nimport com.project.lms.Entity.Reservation;\r\nimport com.project.lms.Entity.Staff;\r\nimport lombok.Data;\r\n\r\nimport javax.persistence.*;\r\n\r\n@Entity\r\n@Data\r\n@Table(name = \"reports\")\r\npublic class Report {\r\n\r\n    @Id\r\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n    private Long reportId;\r\n\r\n    @Enumerated(EnumType.STRING)\r\n    @Column(nullable = false)\r\n    private ReportType reportType;\r\n\r\n    @ManyToOne\r\n    @JoinColumn(name = \"reservation_id\")\r\n    private Reservation reservation;\r\n\r\n    @ManyToOne\r\n    @JoinColumn(name = \"staff_id\")\r\n    private Staff staff;\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/Report.java b/lms/src/main/java/com/project/lms/Entity/Report.java
+--- a/lms/src/main/java/com/project/lms/Entity/Report.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Entity/Report.java	(date 1781448219219)
+@@ -1,8 +1,5 @@
+ package com.project.lms.Entity;
+ 
+-import com.project.lms.Entity.ReportType;
+-import com.project.lms.Entity.Reservation;
+-import com.project.lms.Entity.Staff;
+ import lombok.Data;
+ 
+ import javax.persistence.*;
+@@ -16,10 +13,6 @@
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+     private Long reportId;
+ 
+-    @Enumerated(EnumType.STRING)
+-    @Column(nullable = false)
+-    private ReportType reportType;
+-
+     @ManyToOne
+     @JoinColumn(name = "reservation_id")
+     private Reservation reservation;
+Index: lms/src/main/java/com/project/lms/Entity/Publisher.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Entity;\r\n\r\nimport javax.persistence.CascadeType;\r\nimport javax.persistence.Entity;\r\nimport javax.persistence.Id;\r\nimport javax.persistence.OneToMany;\r\nimport java.util.List;\r\n\r\n@Entity\r\npublic class Publisher {\r\n\r\n    @Id\r\n    private int publisher_id;\r\n    private int yearOfPublication;\r\n    private String name;\r\n\r\n    @OneToMany(cascade = CascadeType.ALL)\r\n    private List<Books> books;\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/Publisher.java b/lms/src/main/java/com/project/lms/Entity/Publisher.java
+--- a/lms/src/main/java/com/project/lms/Entity/Publisher.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Entity/Publisher.java	(date 1781448219219)
+@@ -1,5 +1,9 @@
+ package com.project.lms.Entity;
+ 
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++
+ import javax.persistence.CascadeType;
+ import javax.persistence.Entity;
+ import javax.persistence.Id;
+@@ -7,6 +11,9 @@
+ import java.util.List;
+ 
+ @Entity
++@Data
++@NoArgsConstructor
++@AllArgsConstructor
+ public class Publisher {
+ 
+     @Id
+@@ -14,7 +21,7 @@
+     private int yearOfPublication;
+     private String name;
+ 
+-    @OneToMany(cascade = CascadeType.ALL)
++    @OneToMany
+     private List<Books> books;
+ 
+ }
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Dto/StaffResponse.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Dto/StaffResponse.java b/lms/src/main/java/com/project/lms/Dto/StaffResponse.java
+new file mode 100644
+--- /dev/null	(date 1781448219217)
++++ b/lms/src/main/java/com/project/lms/Dto/StaffResponse.java	(date 1781448219217)
+@@ -0,0 +1,12 @@
++package com.project.lms.Dto;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++
++@Data
++@AllArgsConstructor
++public class StaffResponse {
++
++    private int staffId;
++    private String name;
++}
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Dao/StaffDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Dao/StaffDao.java b/lms/src/main/java/com/project/lms/Dao/StaffDao.java
+new file mode 100644
+--- /dev/null	(date 1781448219217)
++++ b/lms/src/main/java/com/project/lms/Dao/StaffDao.java	(date 1781448219217)
+@@ -0,0 +1,100 @@
++package com.project.lms.Dao;
++
++import com.project.lms.Entity.*;
++import org.hibernate.Session;
++import org.hibernate.SessionFactory;
++import org.hibernate.Transaction;
++import org.hibernate.cfg.Configuration;
++import org.springframework.stereotype.Repository;
++
++import java.util.List;
++import java.util.Optional;
++
++@Repository
++public class StaffDao {
++
++    Configuration c;
++    SessionFactory sf;
++
++    public StaffDao() {
++        c = new Configuration();
++        c.addAnnotatedClass(Reservation.class);
++        c.addAnnotatedClass(Reader.class);
++        c.addAnnotatedClass(Books.class);
++        c.addAnnotatedClass(Report.class);
++        c.addAnnotatedClass(Staff.class);
++        c.addAnnotatedClass(Authentication.class);
++
++        sf = c.buildSessionFactory();
++    }
++
++    public List<Staff> findAll() {
++
++        Session s = sf.openSession();
++
++        try {
++            return s.createQuery(
++                    "from com.project.lms.Entity.Staff",
++                    Staff.class
++            ).list();
++        }
++        finally {
++            s.close();
++        }
++    }
++
++    public Optional<Staff> findById(int id) {
++
++        Session s = sf.openSession();
++
++        try {
++            return Optional.ofNullable(
++                    s.find(Staff.class, id)
++            );
++        }
++        finally {
++            s.close();
++        }
++    }
++
++    public Staff save(Staff staff) {
++
++        Session s = sf.openSession();
++        Transaction tr = s.beginTransaction();
++
++        try {
++            s.saveOrUpdate(staff);
++            tr.commit();
++            return staff;
++        }
++        catch (Exception e) {
++            tr.rollback();
++            throw e;
++        }
++        finally {
++            s.close();
++        }
++    }
++
++    public void deleteById(int id) {
++
++        Session s = sf.openSession();
++        Transaction tr = s.beginTransaction();
++
++        try {
++
++            Staff staff = s.find(Staff.class, id);
++
++            if (staff != null) {
++                s.remove(staff);
++                tr.commit();
++            }
++            else {
++                tr.rollback();
++            }
++
++        } finally {
++            s.close();
++        }
++    }
++}
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Dao/ReportDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Dao/ReportDao.java b/lms/src/main/java/com/project/lms/Dao/ReportDao.java
+new file mode 100644
+--- /dev/null	(date 1781448219215)
++++ b/lms/src/main/java/com/project/lms/Dao/ReportDao.java	(date 1781448219215)
+@@ -0,0 +1,94 @@
++package com.project.lms.Dao;
++
++import com.project.lms.Entity.*;
++import org.hibernate.Session;
++import org.hibernate.SessionFactory;
++import org.hibernate.Transaction;
++import org.hibernate.cfg.Configuration;
++import org.springframework.stereotype.Repository;
++
++import java.util.List;
++import java.util.Optional;
++
++@Repository
++public class ReportDao {
++
++    Configuration c;
++    SessionFactory sf;
++
++    public ReportDao() {
++        c = new Configuration();
++        c.addAnnotatedClass(Reservation.class);
++        c.addAnnotatedClass(Reader.class);
++        c.addAnnotatedClass(Books.class);
++        c.addAnnotatedClass(Report.class);
++        c.addAnnotatedClass(Staff.class);
++        c.addAnnotatedClass(Authentication.class);
++        sf = c.buildSessionFactory();
++    }
++
++    public List<Report> findAll() {
++
++        Session s = sf.openSession();
++
++        try {
++            return s.createQuery(
++                    "from com.project.lms.Entity.Report",
++                    Report.class
++            ).list();
++        } finally {
++            s.close();
++        }
++    }
++
++    public Optional<Report> findById(Long id) {
++
++        Session s = sf.openSession();
++
++        try {
++            return Optional.ofNullable(
++                    s.find(Report.class, id)
++            );
++        } finally {
++            s.close();
++        }
++    }
++
++    public Report save(Report report) {
++
++        Session s = sf.openSession();
++        Transaction tr = s.beginTransaction();
++
++        try {
++            s.saveOrUpdate(report);
++            tr.commit();
++            return report;
++        } catch (Exception e) {
++            tr.rollback();
++            throw e;
++        } finally {
++            s.close();
++        }
++    }
++
++    public void deleteById(Long id) {
++
++        Session s = sf.openSession();
++        Transaction tr = s.beginTransaction();
++
++        try {
++
++            Report report = s.find(Report.class, id);
++
++            if (report != null) {
++                s.remove(report);
++                tr.commit();
++            } else {
++                tr.rollback();
++            }
++
++        } finally {
++            s.close();
++        }
++    }
++}
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Dao/PublisherDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Dao/PublisherDao.java b/lms/src/main/java/com/project/lms/Dao/PublisherDao.java
+new file mode 100644
+--- /dev/null	(date 1781448219215)
++++ b/lms/src/main/java/com/project/lms/Dao/PublisherDao.java	(date 1781448219215)
+@@ -0,0 +1,49 @@
++package com.project.lms.Dao;
++
++import com.project.lms.Entity.Books;
++import com.project.lms.Entity.Publisher;
++import org.hibernate.Session;
++import org.hibernate.SessionFactory;
++import org.hibernate.cfg.Configuration;
++import org.springframework.stereotype.Repository;
++
++import java.util.List;
++import java.util.Optional;
++
++@Repository
++public class PublisherDao {
++
++    Configuration cfg = null;
++    SessionFactory sf = null;
++
++    public PublisherDao(){
++        this.cfg = new Configuration();
++        cfg.addAnnotatedClass(Books.class);
++        this.sf = cfg.buildSessionFactory();
++    }
++
++    public List<Publisher> findAll() {
++        Session s=sf.openSession();
++
++        List <Publisher> publisher =null;
++        try{
++            publisher = s.createQuery("from com.project.lms.Entity.Publisher ", Publisher.class).list();
++        }
++        catch (Exception e) {
++            e.printStackTrace();
++        }
++        finally {
++            s.close();
++        }
++        return publisher;
++    }
++
++    public Optional<Publisher> findById(Integer id) {
++    }
++
++    public Publisher save(Publisher publisher) {
++    }
++
++    public void deleteById(Integer id) {
++    }
++}
+Index: lms/src/main/java/com/project/lms/Service/ReportService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Service/ReportService.java b/lms/src/main/java/com/project/lms/Service/ReportService.java
+new file mode 100644
+--- /dev/null	(date 1781448219222)
++++ b/lms/src/main/java/com/project/lms/Service/ReportService.java	(date 1781448219222)
+@@ -0,0 +1,87 @@
++package com.project.lms.Service;
++
++import com.project.lms.Dao.ReportDao;
++import com.project.lms.Dto.ApiResponse;
++import com.project.lms.Dto.ReportResponse;
++import com.project.lms.Entity.Report;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.stereotype.Service;
++
++import java.util.List;
++import java.util.Optional;
++
++@Service
++public class ReportService {
++
++    @Autowired
++    private ReportDao reportDao;
++
++    private ReportResponse toResponse(Report report) {
++
++        return new ReportResponse(
++                report.getReportId(),
++                report.getReportType(),
++                report.getReservation() != null
++                        ? report.getReservation().getReservationId()
++                        : null,
++                report.getStaff() != null
++                        ? report.getStaff().getStaff_id()
++                        : null
++        );
++    }
++
++    public ApiResponse<List<ReportResponse>> getAllReports() {
++
++        List<Report> reports = reportDao.findAll();
++
++        if (reports.isEmpty())
++            return ApiResponse.fail("No reports found.");
++
++        List<ReportResponse> res =
++                reports.stream()
++                        .map(this::toResponse)
++                        .toList();
++
++        return ApiResponse.ok("All reports fetched.", res);
++    }
++
++    public ApiResponse<ReportResponse> getReportById(Long id) {
++
++        Optional<Report> reportOptional =
++                reportDao.findById(id);
++
++        if (reportOptional.isEmpty())
++            return ApiResponse.fail("Report not found.");
++
++        return ApiResponse.ok(
++                "Report fetched.",
++                toResponse(reportOptional.get())
++        );
++    }
++
++    public ApiResponse<ReportResponse> addReport(Report report) {
++
++        reportDao.save(report);
++
++        return ApiResponse.ok(
++                "Report created.",
++                toResponse(report)
++        );
++    }
++
++    public ApiResponse<Void> deleteReport(Long id) {
++
++        Optional<Report> reportOptional =
++                reportDao.findById(id);
++
++        if (reportOptional.isEmpty())
++            return ApiResponse.fail("Report not found.");
++
++        reportDao.deleteById(id);
++
++        return ApiResponse.ok(
++                "Report deleted.",
++                null
++        );
++    }
++}
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Service/StaffService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Service/StaffService.java b/lms/src/main/java/com/project/lms/Service/StaffService.java
+new file mode 100644
+--- /dev/null	(date 1781448219224)
++++ b/lms/src/main/java/com/project/lms/Service/StaffService.java	(date 1781448219224)
+@@ -0,0 +1,116 @@
++package com.project.lms.Service;
++
++import com.project.lms.Dao.StaffDao;
++import com.project.lms.Dto.ApiResponse;
++import com.project.lms.Dto.StaffResponse;
++import com.project.lms.Entity.Staff;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.stereotype.Service;
++
++import java.util.List;
++import java.util.Optional;
++
++@Service
++public class StaffService {
++
++    @Autowired
++    private StaffDao staffDao;
++
++    private StaffResponse toResponse(Staff staff) {
++        return new StaffResponse(
++                staff.getStaff_id(),
++                staff.getName()
++        );
++    }
++
++    public ApiResponse<List<StaffResponse>> getAllStaff() {
++
++        List<Staff> staffList = staffDao.findAll();
++
++        if (staffList.isEmpty())
++            return ApiResponse.fail("No staff found.");
++
++        List<StaffResponse> res =
++                staffList.stream()
++                        .map(this::toResponse)
++                        .toList();
++
++        return ApiResponse.ok("All staff fetched.", res);
++    }
++
++    public ApiResponse<StaffResponse> getStaffById(int id) {
++
++        Optional<Staff> staffOptional =
++                staffDao.findById(id);
++
++        if (staffOptional.isEmpty())
++            return ApiResponse.fail("Staff not found.");
++
++        return ApiResponse.ok(
++                "Staff fetched.",
++                toResponse(staffOptional.get())
++        );
++    }
++
++    public ApiResponse<StaffResponse> addStaff(
++            StaffResponse res) {
++
++        Optional<Staff> existing =
++                staffDao.findById(res.getStaffId());
++
++        if (existing.isPresent())
++            return ApiResponse.fail("Staff already exists.");
++
++        Staff staff = new Staff();
++        staff.setStaff_id(res.getStaffId());
++        staff.setName(res.getName());
++
++        staffDao.save(staff);
++
++        return ApiResponse.ok(
++                "Staff added.",
++                toResponse(staff)
++        );
++    }
++
++    public ApiResponse<StaffResponse> updateStaff(
++            int id,
++            StaffResponse res) {
++
++        Optional<Staff> staffOptional =
++                staffDao.findById(id);
++
++        if (staffOptional.isEmpty())
++            return ApiResponse.fail("Staff not found.");
++
++        Staff staff = staffOptional.get();
++
++        if (res.getName() != null &&
++                !res.getName().isBlank()) {
++            staff.setName(res.getName());
++        }
++
++        staffDao.save(staff);
++
++        return ApiResponse.ok(
++                "Staff updated.",
++                toResponse(staff)
++        );
++    }
++
++    public ApiResponse<Void> deleteStaff(int id) {
++
++        Optional<Staff> staffOptional =
++                staffDao.findById(id);
++
++        if (staffOptional.isEmpty())
++            return ApiResponse.fail("Staff not found.");
++
++        staffDao.deleteById(id);
++
++        return ApiResponse.ok(
++                "Staff deleted.",
++                null
++        );
++    }
++}
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Controller/ReportController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Controller/ReportController.java b/lms/src/main/java/com/project/lms/Controller/ReportController.java
+new file mode 100644
+--- /dev/null	(date 1781448219213)
++++ b/lms/src/main/java/com/project/lms/Controller/ReportController.java	(date 1781448219213)
+@@ -0,0 +1,66 @@
++package com.project.lms.Controller;
++
++import com.project.lms.Dto.ApiResponse;
++import com.project.lms.Dto.ReportResponse;
++import com.project.lms.Entity.Report;
++import com.project.lms.Service.ReportService;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.*;
++
++import java.util.List;
++
++@RestController
++@RequestMapping("/api/reports")
++public class ReportController {
++
++    @Autowired
++    private ReportService reportService;
++
++    @GetMapping
++    public ResponseEntity<ApiResponse<List<ReportResponse>>> getAllReports() {
++
++        ApiResponse<List<ReportResponse>> res =
++                reportService.getAllReports();
++
++        return res.isSuccess()
++                ? ResponseEntity.ok(res)
++                : ResponseEntity.badRequest().body(res);
++    }
++
++    @GetMapping("/{id}")
++    public ResponseEntity<ApiResponse<ReportResponse>>
++    getReportById(@PathVariable Long id) {
++
++        ApiResponse<ReportResponse> res =
++                reportService.getReportById(id);
++
++        return res.isSuccess()
++                ? ResponseEntity.ok(res)
++                : ResponseEntity.badRequest().body(res);
++    }
++
++    @PostMapping
++    public ResponseEntity<ApiResponse<ReportResponse>>
++    addReport(@RequestBody Report report) {
++
++        ApiResponse<ReportResponse> res =
++                reportService.addReport(report);
++
++        return res.isSuccess()
++                ? ResponseEntity.ok(res)
++                : ResponseEntity.badRequest().body(res);
++    }
++
++    @DeleteMapping("/{id}")
++    public ResponseEntity<ApiResponse<Void>>
++    deleteReport(@PathVariable Long id) {
++
++        ApiResponse<Void> res =
++                reportService.deleteReport(id);
++
++        return res.isSuccess()
++                ? ResponseEntity.ok(res)
++                : ResponseEntity.badRequest().body(res);
++    }
++}
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Controller/PublisherController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Controller/PublisherController.java b/lms/src/main/java/com/project/lms/Controller/PublisherController.java
+new file mode 100644
+--- /dev/null	(date 1781448219211)
++++ b/lms/src/main/java/com/project/lms/Controller/PublisherController.java	(date 1781448219211)
+@@ -0,0 +1,83 @@
++package com.project.lms.Controller;
++
++import com.project.lms.Dto.ApiResponse;
++import com.project.lms.Dto.PublisherResponse;
++import com.project.lms.Entity.Publisher;
++import com.project.lms.Service.PublisherService;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.*;
++
++import java.util.List;
++
++@RestController
++@RequestMapping("/api/publishers")
++public class PublisherController {
++
++    @Autowired
++    private PublisherService publisherService;
++
++    @GetMapping
++    public ResponseEntity<ApiResponse<List<PublisherResponse>>> getAllPublishers() {
++
++        ApiResponse<List<PublisherResponse>> response =
++                publisherService.getAllPublishers();
++
++        return response.isSuccess()
++                ? ResponseEntity.ok(response)
++                : ResponseEntity.badRequest().body(response);
++    }
++
++    @GetMapping("/{id}")
++    public ResponseEntity<ApiResponse<PublisherResponse>> getPublisherById(
++            @PathVariable Integer id
++    ) {
++
++        ApiResponse<PublisherResponse> response =
++                publisherService.getPublisherById(id);
++
++        return response.isSuccess()
++                ? ResponseEntity.ok(response)
++                : ResponseEntity.badRequest().body(response);
++    }
++
++    @PostMapping
++    public ResponseEntity<ApiResponse<PublisherResponse>> addPublisher(
++            @RequestBody Publisher publisher
++    ) {
++
++        ApiResponse<PublisherResponse> response =
++                publisherService.addPublisher(publisher);
++
++        return response.isSuccess()
++                ? ResponseEntity.ok(response)
++                : ResponseEntity.badRequest().body(response);
++    }
++
++    @PutMapping("/{id}")
++    public ResponseEntity<ApiResponse<PublisherResponse>> updatePublisher(
++            @PathVariable Integer id,
++            @RequestBody Publisher publisher
++    ) {
++
++        ApiResponse<PublisherResponse> response =
++                publisherService.updatePublisher(id, publisher);
++
++        return response.isSuccess()
++                ? ResponseEntity.ok(response)
++                : ResponseEntity.badRequest().body(response);
++    }
++
++    @DeleteMapping("/{id}")
++    public ResponseEntity<ApiResponse<Void>> deletePublisher(
++            @PathVariable Integer id
++    ) {
++
++        ApiResponse<Void> response =
++                publisherService.deletePublisher(id);
++
++        return response.isSuccess()
++                ? ResponseEntity.ok(response)
++                : ResponseEntity.badRequest().body(response);
++    }
++}
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Dto/PublisherResponse.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Dto/PublisherResponse.java b/lms/src/main/java/com/project/lms/Dto/PublisherResponse.java
+new file mode 100644
+--- /dev/null	(date 1781448219217)
++++ b/lms/src/main/java/com/project/lms/Dto/PublisherResponse.java	(date 1781448219217)
+@@ -0,0 +1,16 @@
++package com.project.lms.Dto;
++
++import com.project.lms.Entity.Books;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++
++import java.util.List;
++
++@Data
++@AllArgsConstructor
++public class PublisherResponse {
++    private int publisher_id;
++    private int yearOfPublication;
++    private String name;
++    private List<Books> books;
++}
+Index: lms/src/main/java/com/project/lms/Dto/ReportResponse.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Dto/ReportResponse.java b/lms/src/main/java/com/project/lms/Dto/ReportResponse.java
+new file mode 100644
+--- /dev/null	(date 1781448219217)
++++ b/lms/src/main/java/com/project/lms/Dto/ReportResponse.java	(date 1781448219217)
+@@ -0,0 +1,15 @@
++package com.project.lms.Dto;
++
++import com.project.lms.Entity.ReservationType;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++
++@Data
++@AllArgsConstructor
++public class ReportResponse {
++
++    private Long reportId;
++    private ReservationType reportType;
++    private Integer reservationId;
++    private Integer staffId;
++}
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Service/PublisherService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Service/PublisherService.java b/lms/src/main/java/com/project/lms/Service/PublisherService.java
+new file mode 100644
+--- /dev/null	(date 1781448219222)
++++ b/lms/src/main/java/com/project/lms/Service/PublisherService.java	(date 1781448219222)
+@@ -0,0 +1,133 @@
++package com.project.lms.Service;
++
++import com.project.lms.Dao.PublisherDao;
++import com.project.lms.Dto.ApiResponse;
++import com.project.lms.Dto.PublisherResponse;
++import com.project.lms.Entity.Publisher;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.stereotype.Service;
++
++import java.util.List;
++import java.util.Optional;
++
++@Service
++public class PublisherService {
++
++    @Autowired
++    private PublisherDao publisherDao;
++
++    private PublisherResponse toPublisherResponse(Publisher publisher) {
++        return new PublisherResponse(
++                publisher.getPublisher_id(),
++                publisher.getYearOfPublication(),
++                publisher.getName(),
++                publisher.getBooks()
++        );
++    }
++
++    public ApiResponse<List<PublisherResponse>> getAllPublishers() {
++
++        List<Publisher> publishers = publisherDao.findAll();
++
++        if (publishers.isEmpty()) {
++            return ApiResponse.fail("No publishers found.");
++        }
++
++        List<PublisherResponse> response = publishers.stream()
++                .map(this::toPublisherResponse)
++                .toList();
++
++        return ApiResponse.ok("All publishers fetched.", response);
++    }
++
++    public ApiResponse<PublisherResponse> getPublisherById(Integer id) {
++
++        Optional<Publisher> publisherOptional =
++                publisherDao.findById(id);
++
++        if (publisherOptional.isEmpty()) {
++            return ApiResponse.fail("Publisher not found.");
++        }
++
++        return ApiResponse.ok(
++                "Publisher fetched.",
++                toPublisherResponse(publisherOptional.get())
++        );
++    }
++
++    public ApiResponse<PublisherResponse> addPublisher(Publisher publisher) {
++
++        Optional<Publisher> existingPublisher =
++                publisherDao.findById(publisher.getPublisher_id());
++
++        if (existingPublisher.isPresent()) {
++            return ApiResponse.fail("Publisher already exists.");
++        }
++
++        Publisher savedPublisher =
++                publisherDao.save(publisher);
++
++        return ApiResponse.ok(
++                "Publisher added.",
++                toPublisherResponse(savedPublisher)
++        );
++    }
++
++    public ApiResponse<PublisherResponse> updatePublisher(
++            Integer id,
++            Publisher publisher
++    ) {
++
++        Optional<Publisher> publisherOptional =
++                publisherDao.findById(id);
++
++        if (publisherOptional.isEmpty()) {
++            return ApiResponse.fail("Publisher not found.");
++        }
++
++        Publisher existingPublisher =
++                publisherOptional.get();
++
++        if (publisher.getName() != null &&
++                !publisher.getName().isBlank()) {
++            existingPublisher.setName(publisher.getName());
++        }
++
++        if (publisher.getYearOfPublication() > 0) {
++            existingPublisher.setYearOfPublication(
++                    publisher.getYearOfPublication()
++            );
++        }
++
++        if (publisher.getBooks() != null &&
++                !publisher.getBooks().isEmpty()) {
++            existingPublisher.setBooks(
++                    publisher.getBooks()
++            );
++        }
++
++        publisherDao.save(existingPublisher);
++
++        return ApiResponse.ok(
++                "Publisher updated.",
++                toPublisherResponse(existingPublisher)
++        );
++    }
++
++    public ApiResponse<Void> deletePublisher(Integer id) {
++
++        Optional<Publisher> publisherOptional =
++                publisherDao.findById(id);
++
++        if (publisherOptional.isEmpty()) {
++            return ApiResponse.fail("Publisher not found.");
++        }
++
++        publisherDao.deleteById(id);
++
++        return ApiResponse.ok(
++                "Publisher deleted.",
++                null
++        );
++    }
++}
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Entity/ReportType.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/ReportType.java b/lms/src/main/java/com/project/lms/Entity/ReservationType.java
+rename from lms/src/main/java/com/project/lms/Entity/ReportType.java
+rename to lms/src/main/java/com/project/lms/Entity/ReservationType.java
+--- a/lms/src/main/java/com/project/lms/Entity/ReportType.java	(revision 591638a1b72d5b100c5f0e0ec62c0dc7cb0ed523)
++++ b/lms/src/main/java/com/project/lms/Entity/ReservationType.java	(date 1781448219219)
+@@ -1,6 +1,6 @@
+ package com.project.lms.Entity;
+ 
+-public enum ReportType {
++public enum ReservationType {
+     ISSUE,
+     RETURN
+ }
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Controller/StaffController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Controller/StaffController.java b/lms/src/main/java/com/project/lms/Controller/StaffController.java
+new file mode 100644
+--- /dev/null	(date 1781448219213)
++++ b/lms/src/main/java/com/project/lms/Controller/StaffController.java	(date 1781448219213)
+@@ -0,0 +1,79 @@
++package com.project.lms.Controller;
++
++import com.project.lms.Dto.ApiResponse;
++import com.project.lms.Dto.StaffResponse;
++import com.project.lms.Service.StaffService;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.*;
++
++import java.util.List;
++
++@RestController
++@RequestMapping("/api/staff")
++public class StaffController {
++
++    @Autowired
++    private StaffService staffService;
++
++    @GetMapping
++    public ResponseEntity<ApiResponse<List<StaffResponse>>> getAllStaff() {
++
++        ApiResponse<List<StaffResponse>> res =
++                staffService.getAllStaff();
++
++        return res.isSuccess()
++                ? ResponseEntity.ok(res)
++                : ResponseEntity.badRequest().body(res);
++    }
++
++    @GetMapping("/{id}")
++    public ResponseEntity<ApiResponse<StaffResponse>>
++    getStaffById(@PathVariable int id) {
++
++        ApiResponse<StaffResponse> res =
++                staffService.getStaffById(id);
++
++        return res.isSuccess()
++                ? ResponseEntity.ok(res)
++                : ResponseEntity.badRequest().body(res);
++    }
++
++    @PostMapping
++    public ResponseEntity<ApiResponse<StaffResponse>>
++    addStaff(@RequestBody StaffResponse response) {
++
++        ApiResponse<StaffResponse> res =
++                staffService.addStaff(response);
++
++        return res.isSuccess()
++                ? ResponseEntity.ok(res)
++                : ResponseEntity.badRequest().body(res);
++    }
++
++    @PutMapping("/{id}")
++    public ResponseEntity<ApiResponse<StaffResponse>>
++    updateStaff(
++            @PathVariable int id,
++            @RequestBody StaffResponse response) {
++
++        ApiResponse<StaffResponse> res =
++                staffService.updateStaff(id, response);
++
++        return res.isSuccess()
++                ? ResponseEntity.ok(res)
++                : ResponseEntity.badRequest().body(res);
++    }
++
++    @DeleteMapping("/{id}")
++    public ResponseEntity<ApiResponse<Void>>
++    deleteStaff(@PathVariable int id) {
++
++        ApiResponse<Void> res =
++                staffService.deleteStaff(id);
++
++        return res.isSuccess()
++                ? ResponseEntity.ok(res)
++                : ResponseEntity.badRequest().body(res);
++    }
++}
+\ No newline at end of file

@@ -9,6 +9,8 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public class AuthDao {
 
@@ -22,18 +24,11 @@ public class AuthDao {
         c.addAnnotatedClass(Books.class);
         sf=c.buildSessionFactory();
     }
+
     public void save(Authentication auth) {
-        Session s = sf.openSession();
-        Transaction tr = s.beginTransaction();
-        try {
-            s.persist(auth);
-            tr.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            tr.rollback();
-        }
-        finally {
-            s.close();
-        }
+
+    }
+
+    public Optional<Authentication> findByEmail(String email) {
     }
 }
