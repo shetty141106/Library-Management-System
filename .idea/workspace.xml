@@ -5,23 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4caf10f8-3d63-433b-a6f3-647a2e7eb226" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Configuration/ApplicationConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/AuthDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/ReaderResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/RegisterRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Authentication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/AuthService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/lms/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Configuration/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Configuration/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/BooksController.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/BooksController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/ReaderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/ReaderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/ReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/ReaderDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Reader.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Reader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/RefreshToken.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/RefreshToken.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Security/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Security/JwtAuthenticationFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Security/JwtService.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Security/JwtService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/BooksService.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/BooksService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,6 +93,15 @@
       <option name="presentableId" value="Default" />
       <updated>1781238191362</updated>
     </task>
+    <task id="LOCAL-00001">
+      <option name="closed" value="true" />
+      <created>1781338585958</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1781338585958</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
