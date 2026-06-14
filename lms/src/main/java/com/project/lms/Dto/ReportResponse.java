@@ -9,7 +9,6 @@ import lombok.Data;
 public class ReportResponse {
 
     private Long reportId;
-    private ReservationType reportType;
     private Integer reservationId;
     private Integer staffId;
 }

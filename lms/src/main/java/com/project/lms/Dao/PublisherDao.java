@@ -1,9 +1,9 @@
 package com.project.lms.Dao;
 
-import com.project.lms.Entity.Books;
-import com.project.lms.Entity.Publisher;
+import com.project.lms.Entity.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Repository;
 
@@ -13,37 +13,74 @@ import java.util.Optional;
 @Repository
 public class PublisherDao {
 
-    Configuration cfg = null;
+    Configuration c = null;
     SessionFactory sf = null;
 
-    public PublisherDao(){
-        this.cfg = new Configuration();
-        cfg.addAnnotatedClass(Books.class);
-        this.sf = cfg.buildSessionFactory();
+    public PublisherDao() {
+        c = new Configuration();
+        c.addAnnotatedClass(Reservation.class);
+        c.addAnnotatedClass(Reader.class);
+        c.addAnnotatedClass(Books.class);
+        c.addAnnotatedClass(Report.class);
+        c.addAnnotatedClass(Staff.class);
+        c.addAnnotatedClass(Authentication.class);
+        sf = c.buildSessionFactory();
     }
 
     public List<Publisher> findAll() {
-        Session s=sf.openSession();
+        Session s = sf.openSession();
 
-        List <Publisher> publisher =null;
-        try{
+        List<Publisher> publisher = null;
+        try {
             publisher = s.createQuery("from com.project.lms.Entity.Publisher ", Publisher.class).list();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             s.close();
         }
         return publisher;
     }
 
     public Optional<Publisher> findById(Integer id) {
+
+        Session session = sf.openSession();
+        Publisher publisher = null;
+        try {
+            publisher = session.find(Publisher.class, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return Optional.ofNullable(publisher);
     }
 
     public Publisher save(Publisher publisher) {
+        Session s = sf.openSession();
+        Transaction tr = s.beginTransaction();
+        try {
+            s.persist(publisher);
+            tr.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            tr.rollback();
+        } finally {
+            s.close();
+        }
+        return publisher;
     }
 
     public void deleteById(Integer id) {
+        Session s = sf.openSession();
+        Transaction tr = s.beginTransaction();
+        try {
+            s.remove(Publisher.class);
+            tr.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            tr.rollback();
+        } finally {
+            s.close();
+        }
     }
 }

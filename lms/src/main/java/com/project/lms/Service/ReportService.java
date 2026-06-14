@@ -20,7 +20,6 @@ public class ReportService {
 
         return new ReportResponse(
                 report.getReportId(),
-                report.getReportType(),
                 report.getReservation() != null
                         ? report.getReservation().getReservationId()
                         : null,
