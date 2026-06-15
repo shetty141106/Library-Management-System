@@ -5,6 +5,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public class ReservationDao {
     Configuration c=null;
@@ -20,5 +22,11 @@ public class ReservationDao {
     }
 
     public void save(Reservation reservation) {
+    }
+
+    public void deleteById(Long resid) {
+    }
+
+    public Optional<Reservation> findById(Long resid) {
     }
 }

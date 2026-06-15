@@ -56,11 +56,23 @@ public class ReservationService {
         reservation.setIssueDate(LocalDate.now());
         reservation.setReturnDate(req.getReturnDate());
         reservation.setDueDate(LocalDate.now().plusDays(14));
+        book.setQuantity(book.getQuantity()-1);
+        reservation.setBook(book);
         resdao.save(reservation);
+        book.setQuantity(book.getQuantity()-1);
         return ApiResponse.ok("Book issued",toResponse(reservation));
     }
 
-    public ApiResponse<ReservationResponse> returnBook(ReservationRequest req) {
-        Optional<Reservation> opt = resdao.findById(req.get);
+    public ApiResponse<ReservationResponse> returnBook(Long resid) {
+        Optional<Reservation> resOpt = resdao.findById(resid);
+        if(resOpt.isEmpty())
+            return ApiResponse.fail("No data found.");
+        resdao.deleteById(resid);
+        Reservation reservation = resOpt.get();
+        Optional<Books> booksOpt = bookDao.findById(reservation.getBook().getIsbn());
+        Books book = booksOpt.get();
+        book.setQuantity(book.getQuantity()+1);
+        reservation.setBook(book);
+        return ApiResponse.ok("Book returned.", null);
     }
 }
