@@ -3,7 +3,7 @@ package com.project.lms.Entity;
 import lombok.*;
 
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
@@ -29,7 +29,7 @@ public class Reader {
     private Authentication authentication;
 
     @OneToMany
-    private Reservation reservation;
+    private List<Reservation> reservation;
 
 }
 

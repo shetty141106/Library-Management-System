@@ -5,7 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -35,5 +37,5 @@ public class Books {
     private Reader reader;
 
     @OneToMany
-    private Reservation reservation;
+    private List<Reservation> reservation;
 }

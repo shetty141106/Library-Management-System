@@ -52,26 +52,6 @@ public class StaffService {
         );
     }
 
-    public ApiResponse<StaffResponse> addStaff(
-            StaffResponse res) {
-
-        Optional<Staff> existing =
-                staffDao.findById(res.getStaffId());
-
-        if (existing.isPresent())
-            return ApiResponse.fail("Staff already exists.");
-
-        Staff staff = new Staff();
-        staff.setStaff_id(res.getStaffId());
-        staff.setName(res.getName());
-
-        staffDao.save(staff);
-
-        return ApiResponse.ok(
-                "Staff added.",
-                toResponse(staff)
-        );
-    }
 
     public ApiResponse<StaffResponse> updateStaff(
             int id,
