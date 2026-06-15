@@ -30,5 +30,6 @@ public class AuthDao {
     }
 
     public Optional<Authentication> findByEmail(String email) {
+
     }
 }

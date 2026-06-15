@@ -52,8 +52,6 @@ public class AuthService {
                 .email(reader.getAuthentication().getEmail())
                 .address(reader.getAddress())
                 .phones(reader.getPhones())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -102,5 +100,19 @@ public class AuthService {
         String jwtToken = jwtService.generateToken(auth);
         RefreshToken refreshToken = createRefreshToken(auth);
         return ApiResponse.ok("Login Successful.", toReaderResponse(auth.getReader(), jwtToken, refreshToken.getToken()));
+    }
+
+    public ApiResponse<Void> updatePassword(UpdatePasswordRequest req) {
+        if(req.getEmail().isBlank())
+            return ApiResponse.fail("Email is required.");
+        Optional<Authentication> opt = authDao.findByEmail(req.getEmail());
+        if(opt.isEmpty())
+            return ApiResponse.fail("User not found.");
+        Authentication auth = opt.get();
+        if(!passwordEncoder.matches(auth.getPassword(), req.getOld_password()))
+            return ApiResponse.fail("Enter valid password.");
+        auth.setPassword(passwordEncoder.encode(req.getPassword()));
+        authDao.save(auth);
+        return ApiResponse.ok("Password updated.", null);
     }
 }

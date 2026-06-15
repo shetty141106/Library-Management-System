@@ -27,7 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -88,11 +88,6 @@
 			<version>5.6.15.Final</version>
 			<scope>compile</scope>
 		</dependency>
-        <dependency>
-            <groupId>com.project</groupId>
-            <artifactId>lms</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>

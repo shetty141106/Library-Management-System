@@ -28,6 +28,9 @@ public class Reader {
     @OneToOne
     private Authentication authentication;
 
+    @OneToMany
+    private Reservation reservation;
+
 }
 
 

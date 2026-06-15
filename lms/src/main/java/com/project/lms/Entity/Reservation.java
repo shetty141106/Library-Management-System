@@ -24,12 +24,13 @@ public class Reservation {
     @JoinColumn(name = "reader_id")
     private Reader reader;
 
-    @OneToMany(mappedBy = "reservation")
-    private List<Report> reports = new ArrayList<>();
-
     @ManyToOne
     @JoinColumn(name = "isbn")
     private Books book;
+
+    @ManyToOne
+    @JoinColumn(name = "staff_id")
+    private Staff staff;
 
     private LocalDate issueDate;
 

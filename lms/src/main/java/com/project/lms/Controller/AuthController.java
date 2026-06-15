@@ -4,10 +4,7 @@ import com.project.lms.Dto.*;
 import com.project.lms.Service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -28,4 +25,11 @@ public class AuthController {
         ApiResponse<ReaderResponse> res = authService.login(req);
         return res.isSuccess()? ResponseEntity.ok(res):ResponseEntity.badRequest().body(res);
     }
+
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse<Void>> updatePassword(@RequestBody UpdatePasswordRequest req) {
+        ApiResponse<Void> res = authService.updatePassword(req);
+        return res.isSuccess()? ResponseEntity.ok(res):ResponseEntity.badRequest().body(res);
+    }
+
 }

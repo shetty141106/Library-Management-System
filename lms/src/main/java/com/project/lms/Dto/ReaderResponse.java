@@ -16,7 +16,4 @@ public class ReaderResponse {
     private String email;
     private String address;
     private List<String> phones;
-    private String accessToken;
-    private String refreshToken;
-    private String username;
 }

@@ -20,7 +20,6 @@ public class ReaderService {
         return new ReaderResponse(
                 reader.getName(),
                 reader.getAuthentication().getEmail(),
-                reader.getAuthentication().getPassword(),
                 reader.getAddress(),
                 reader.getPhones()
         );
@@ -46,14 +45,11 @@ public class ReaderService {
 
         Optional<Reader> readerOptional = readerDao.findById(id);
 
-        if (readerOptional.isEmpty()) {
-            return ApiResponse.fail("Reader not found.");
-        }
-
-        return ApiResponse.ok(
+        return readerOptional.map(reader -> ApiResponse.ok(
                 "Reader fetched.",
-                toReaderResponse(readerOptional.get())
-        );
+                toReaderResponse(reader)
+        )).orElseGet(() -> ApiResponse.fail("Reader not found."));
+
     }
 
     public ApiResponse<ReaderResponse> addReader(Reader reader) {
