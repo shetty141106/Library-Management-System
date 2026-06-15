@@ -21,7 +21,6 @@ public class PublisherDao {
         c.addAnnotatedClass(Reservation.class);
         c.addAnnotatedClass(Reader.class);
         c.addAnnotatedClass(Books.class);
-        c.addAnnotatedClass(Report.class);
         c.addAnnotatedClass(Staff.class);
         c.addAnnotatedClass(Authentication.class);
         sf = c.buildSessionFactory();
