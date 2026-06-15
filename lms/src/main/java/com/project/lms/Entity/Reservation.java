@@ -14,11 +14,10 @@ public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int reservationId;
+    private Long reservationId;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ReservationType reportType;
+    private String reservationType;
 
     @ManyToOne
     @JoinColumn(name = "reader_id")

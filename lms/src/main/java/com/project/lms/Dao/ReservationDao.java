@@ -20,4 +20,6 @@ public class ReservationDao {
         sf= c.buildSessionFactory();
     }
 
+    public void save(Reservation reservation) {
+    }
 }
