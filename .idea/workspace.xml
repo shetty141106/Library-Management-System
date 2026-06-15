@@ -5,14 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4caf10f8-3d63-433b-a6f3-647a2e7eb226" name="Changes" comment="Merge branch 'main' of https://github.com/shetty141106/Library-Management-System&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml">
-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/RefreshTokenDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/LoginRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/AuthDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/AuthDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/ReaderResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/ReaderResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Authentication.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Authentication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/AuthService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
