@@ -1,7 +1,9 @@
 package com.project.lms.Dao;
 
 import com.project.lms.Entity.*;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Repository;
 
@@ -22,6 +24,16 @@ public class ReservationDao {
     }
 
     public void save(Reservation reservation) {
+        Session session=sf.openSession();
+        Transaction tr= session.beginTransaction();
+        try {
+            session.persist(reservation);
+            tr.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            tr.rollback();
+        }
+
     }
 
     public void deleteById(Long resid) {
