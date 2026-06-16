@@ -1,0 +1,825 @@
+Index: lms/src/main/java/com/project/lms/Entity/Authentication.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Entity;\r\n\r\nimport javax.persistence.*;\r\nimport lombok.AllArgsConstructor;\r\nimport lombok.Data;\r\nimport lombok.NoArgsConstructor;\r\nimport org.springframework.security.core.GrantedAuthority;\r\nimport org.springframework.security.core.authority.SimpleGrantedAuthority;\r\nimport org.springframework.security.core.userdetails.UserDetails;\r\n\r\nimport java.util.Collection;\r\nimport java.util.List;\r\n\r\n\r\n@Entity\r\n@Data\r\n@NoArgsConstructor\r\n@AllArgsConstructor\r\npublic class Authentication implements UserDetails {\r\n\r\n    @Id\r\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n    private Long userId;\r\n\r\n    private String email;\r\n    private String password;\r\n\r\n    @OneToOne(mappedBy = \"authentication\", cascade = CascadeType.ALL)\r\n    private Reader reader;\r\n\r\n    @Override\r\n    public Collection<? extends GrantedAuthority> getAuthorities() {\r\n        return List.of(new SimpleGrantedAuthority(\"ROLE_USER\"));\r\n    }\r\n\r\n    @Override\r\n    public String getUsername() {\r\n        return this.email;\r\n    }\r\n\r\n    @Override\r\n    public boolean isAccountNonExpired() { return true; }\r\n\r\n    @Override\r\n    public boolean isAccountNonLocked() { return true; }\r\n\r\n    @Override\r\n    public boolean isCredentialsNonExpired() { return true; }\r\n\r\n    @Override\r\n    public boolean isEnabled() { return true; }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/Authentication.java b/lms/src/main/java/com/project/lms/Entity/Authentication.java
+--- a/lms/src/main/java/com/project/lms/Entity/Authentication.java	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/lms/src/main/java/com/project/lms/Entity/Authentication.java	(date 1781539437419)
+@@ -1,6 +1,6 @@
+ package com.project.lms.Entity;
+ 
+-import javax.persistence.*;
++import jakarta.persistence.*;
+ import lombok.AllArgsConstructor;
+ import lombok.Data;
+ import lombok.NoArgsConstructor;
+@@ -26,7 +26,7 @@
+     private String password;
+ 
+     @OneToOne(mappedBy = "authentication", cascade = CascadeType.ALL)
+-    private Reader reader;
++    private Staff staff;
+ 
+     @Override
+     public Collection<? extends GrantedAuthority> getAuthorities() {
+Index: lms/src/main/java/com/project/lms/Service/AuthService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Service;\r\n\r\nimport com.project.lms.Dao.AuthDao;\r\nimport com.project.lms.Dao.RefreshTokenDao;\r\nimport com.project.lms.Dto.*;\r\nimport com.project.lms.Entity.Authentication;\r\nimport com.project.lms.Entity.Reader;\r\nimport com.project.lms.Entity.RefreshToken;\r\nimport com.project.lms.Security.JwtService;\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.security.authentication.AuthenticationManager;\r\nimport org.springframework.security.authentication.UsernamePasswordAuthenticationToken;\r\nimport org.springframework.security.crypto.password.PasswordEncoder;\r\nimport org.springframework.stereotype.Service;\r\n\r\nimport java.time.Instant;\r\nimport java.util.Optional;\r\nimport java.util.UUID;\r\n\r\n@Service\r\npublic class AuthService {\r\n\r\n    @Autowired\r\n    private AuthDao authDao;\r\n\r\n    @Autowired\r\n    private JwtService jwtService;\r\n\r\n    @Autowired\r\n    private RefreshTokenDao refreshTokenDao;\r\n\r\n    @Autowired\r\n    private AuthenticationManager authenticationManager;\r\n\r\n    @Autowired\r\n    private PasswordEncoder passwordEncoder;\r\n\r\n    private RefreshToken createRefreshToken(Authentication auth) {\r\n        RefreshToken refreshToken = RefreshToken.builder()\r\n                .user(auth)\r\n                .token(UUID.randomUUID().toString())\r\n                .expiryDate(Instant.now().plusMillis(7L * 24 * 60 * 60 * 1000)) // Valid for 7 days\r\n                .revoked(false)\r\n                .build();\r\n\r\n        return refreshTokenDao.save(refreshToken);\r\n    }\r\n\r\n    private ReaderResponse toReaderResponse (Reader reader, String accessToken, String refreshToken){\r\n        return ReaderResponse.builder()\r\n                .name(reader.getName())\r\n                .email(reader.getAuthentication().getEmail())\r\n                .address(reader.getAddress())\r\n                .phones(reader.getPhones())\r\n                .build();\r\n    }\r\n\r\n    public ApiResponse<ReaderResponse> register(RegisterRequest req) {\r\n        Optional<Authentication> opt = authDao.findByEmail(req.getEmail());\r\n        if(opt.isPresent())\r\n            return ApiResponse.fail(\"User already exists.\");\r\n\r\n        if(req.getName().isBlank() || req.getEmail().isBlank() || req.getAddress().isBlank() || req.getPhones().isEmpty() || req.getPassword().isBlank() || req.getConfirm_password().isBlank())\r\n            return ApiResponse.fail(\"All fields are required.\");\r\n        if(!req.getPassword().equals(req.getConfirm_password()))\r\n            return ApiResponse.fail(\"Password do not match.\");\r\n\r\n        Authentication auth = new Authentication();\r\n        auth.setEmail(req.getEmail());\r\n        auth.setPassword(passwordEncoder.encode(req.getPassword()));\r\n\r\n        Reader reader = new Reader();\r\n        reader.setName(req.getName());\r\n        reader.setAddress(req.getAddress());\r\n        reader.setPhones(req.getPhones());\r\n\r\n        auth.setReader(reader);\r\n        reader.setAuthentication(auth);\r\n        authDao.save(auth);\r\n\r\n        String jwtToken = jwtService.generateToken(auth);\r\n        RefreshToken refreshToken = createRefreshToken(auth);\r\n        return ApiResponse.ok(\"Registration Successful.\", toReaderResponse(reader, jwtToken, refreshToken.getToken()));\r\n    }\r\n\r\n    public ApiResponse<ReaderResponse> login(LoginRequest req) {\r\n        Optional<Authentication> opt = authDao.findByEmail(req.getEmail());\r\n        if(opt.isEmpty())\r\n            return ApiResponse.fail(\"User not found.\");\r\n        Authentication auth = opt.get();\r\n\r\n        try{\r\n            authenticationManager.authenticate(\r\n                    new UsernamePasswordAuthenticationToken(auth.getEmail(), req.getPassword())\r\n            );\r\n        }\r\n        catch (Exception e){\r\n            return ApiResponse.fail(\"Invalid email or password.\");\r\n        }\r\n        String jwtToken = jwtService.generateToken(auth);\r\n        RefreshToken refreshToken = createRefreshToken(auth);\r\n        return ApiResponse.ok(\"Login Successful.\", toReaderResponse(auth.getReader(), jwtToken, refreshToken.getToken()));\r\n    }\r\n\r\n    public ApiResponse<Void> updatePassword(UpdatePasswordRequest req) {\r\n        if(req.getEmail().isBlank())\r\n            return ApiResponse.fail(\"Email is required.\");\r\n        Optional<Authentication> opt = authDao.findByEmail(req.getEmail());\r\n        if(opt.isEmpty())\r\n            return ApiResponse.fail(\"User not found.\");\r\n        Authentication auth = opt.get();\r\n        if(!passwordEncoder.matches(auth.getPassword(), req.getOld_password()))\r\n            return ApiResponse.fail(\"Enter valid password.\");\r\n        auth.setPassword(passwordEncoder.encode(req.getPassword()));\r\n        authDao.save(auth);\r\n        return ApiResponse.ok(\"Password updated.\", null);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Service/AuthService.java b/lms/src/main/java/com/project/lms/Service/AuthService.java
+--- a/lms/src/main/java/com/project/lms/Service/AuthService.java	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/lms/src/main/java/com/project/lms/Service/AuthService.java	(date 1781539437426)
+@@ -6,6 +6,7 @@
+ import com.project.lms.Entity.Authentication;
+ import com.project.lms.Entity.Reader;
+ import com.project.lms.Entity.RefreshToken;
++import com.project.lms.Entity.Staff;
+ import com.project.lms.Security.JwtService;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.security.authentication.AuthenticationManager;
+@@ -55,52 +56,51 @@
+                 .build();
+     }
+ 
+-    public ApiResponse<ReaderResponse> register(RegisterRequest req) {
+-        Optional<Authentication> opt = authDao.findByEmail(req.getEmail());
+-        if(opt.isPresent())
+-            return ApiResponse.fail("User already exists.");
+-
+-        if(req.getName().isBlank() || req.getEmail().isBlank() || req.getAddress().isBlank() || req.getPhones().isEmpty() || req.getPassword().isBlank() || req.getConfirm_password().isBlank())
+-            return ApiResponse.fail("All fields are required.");
+-        if(!req.getPassword().equals(req.getConfirm_password()))
+-            return ApiResponse.fail("Password do not match.");
+-
+-        Authentication auth = new Authentication();
+-        auth.setEmail(req.getEmail());
+-        auth.setPassword(passwordEncoder.encode(req.getPassword()));
+-
+-        Reader reader = new Reader();
+-        reader.setName(req.getName());
+-        reader.setAddress(req.getAddress());
+-        reader.setPhones(req.getPhones());
+-
+-        auth.setReader(reader);
+-        reader.setAuthentication(auth);
+-        authDao.save(auth);
+-
+-        String jwtToken = jwtService.generateToken(auth);
+-        RefreshToken refreshToken = createRefreshToken(auth);
+-        return ApiResponse.ok("Registration Successful.", toReaderResponse(reader, jwtToken, refreshToken.getToken()));
+-    }
+-
+-    public ApiResponse<ReaderResponse> login(LoginRequest req) {
+-        Optional<Authentication> opt = authDao.findByEmail(req.getEmail());
+-        if(opt.isEmpty())
+-            return ApiResponse.fail("User not found.");
+-        Authentication auth = opt.get();
+-
+-        try{
+-            authenticationManager.authenticate(
+-                    new UsernamePasswordAuthenticationToken(auth.getEmail(), req.getPassword())
+-            );
+-        }
+-        catch (Exception e){
+-            return ApiResponse.fail("Invalid email or password.");
+-        }
+-        String jwtToken = jwtService.generateToken(auth);
+-        RefreshToken refreshToken = createRefreshToken(auth);
+-        return ApiResponse.ok("Login Successful.", toReaderResponse(auth.getReader(), jwtToken, refreshToken.getToken()));
+-    }
++//    public ApiResponse<ReaderResponse> register(RegisterRequest req) {
++//        Optional<Authentication> opt = authDao.findByEmail(req.getEmail());
++//        if(opt.isPresent())
++//            return ApiResponse.fail("User already exists.");
++//
++//        if(req.getName().isBlank() || req.getEmail().isBlank() || req.getAddress().isBlank() || req.getPhones().isEmpty() || req.getPassword().isBlank() || req.getConfirm_password().isBlank())
++//            return ApiResponse.fail("All fields are required.");
++//        if(!req.getPassword().equals(req.getConfirm_password()))
++//            return ApiResponse.fail("Password do not match.");
++//
++//        Authentication auth = new Authentication();
++//        auth.setEmail(req.getEmail());
++//        auth.setPassword(passwordEncoder.encode(req.getPassword()));
++//
++//        Staff staff=new Staff();
++//        staff.setName(req.getName());
++//        staff.setAddress(req.getAddress());
++//
++//        auth.setStaff(staff);
++//        staff.setAuthentication(auth);
++//        authDao.save(auth);
++//
++//        String jwtToken = jwtService.generateToken(auth);
++//        RefreshToken refreshToken = createRefreshToken(auth);
++//        return ApiResponse.ok("Registration Successful.", toReaderResponse(reader, jwtToken, refreshToken.getToken()));
++//    }
++//
++//    public ApiResponse<ReaderResponse> login(LoginRequest req) {
++//        Optional<Authentication> opt = authDao.findByEmail(req.getEmail());
++//        if(opt.isEmpty())
++//            return ApiResponse.fail("User not found.");
++//        Authentication auth = opt.get();
++//
++//        try{
++//            authenticationManager.authenticate(
++//                    new UsernamePasswordAuthenticationToken(auth.getEmail(), req.getPassword())
++//            );
++//        }
++//        catch (Exception e){
++//            return ApiResponse.fail("Invalid email or password.");
++//        }
++//        String jwtToken = jwtService.generateToken(auth);
++//        RefreshToken refreshToken = createRefreshToken(auth);
++//        return ApiResponse.ok("Login Successful.", toReaderResponse(auth.getReader(), jwtToken, refreshToken.getToken()));
++//    }
+ 
+     public ApiResponse<Void> updatePassword(UpdatePasswordRequest req) {
+         if(req.getEmail().isBlank())
+Index: lms/src/main/java/com/project/lms/Dao/AuthDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Dao;\r\n\r\nimport com.project.lms.Entity.Authentication;\r\nimport com.project.lms.Entity.Books;\r\nimport com.project.lms.Entity.Reader;\r\nimport org.hibernate.Session;\r\nimport org.hibernate.SessionFactory;\r\nimport org.hibernate.Transaction;\r\nimport org.hibernate.cfg.Configuration;\r\nimport org.springframework.stereotype.Repository;\r\n\r\nimport java.util.Optional;\r\n\r\n@Repository\r\npublic class AuthDao {\r\n\r\n    Configuration c=null;\r\n    SessionFactory sf=null;\r\n\r\n    public AuthDao(){\r\n        c=new Configuration();\r\n        c.addAnnotatedClass(Authentication.class);\r\n        c.addAnnotatedClass(Reader.class);\r\n        c.addAnnotatedClass(Books.class);\r\n        sf=c.buildSessionFactory();\r\n    }\r\n\r\n    public void save(Authentication auth) {\r\n\r\n    }\r\n\r\n    public Optional<Authentication> findByEmail(String email) {\r\n\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Dao/AuthDao.java b/lms/src/main/java/com/project/lms/Dao/AuthDao.java
+--- a/lms/src/main/java/com/project/lms/Dao/AuthDao.java	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/lms/src/main/java/com/project/lms/Dao/AuthDao.java	(date 1781539437415)
+@@ -14,22 +14,51 @@
+ @Repository
+ public class AuthDao {
+ 
+-    Configuration c=null;
+-    SessionFactory sf=null;
++    Configuration c = null;
++    SessionFactory sf = null;
+ 
+-    public AuthDao(){
+-        c=new Configuration();
++    public AuthDao() {
++        c = new Configuration();
+         c.addAnnotatedClass(Authentication.class);
+         c.addAnnotatedClass(Reader.class);
+         c.addAnnotatedClass(Books.class);
+-        sf=c.buildSessionFactory();
++        sf = c.buildSessionFactory();
+     }
+ 
+     public void save(Authentication auth) {
+ 
++        Session s = sf.openSession();
++        Transaction tr = s.beginTransaction();
++        try {
++            s.persist(auth);
++            tr.commit();
++        } catch (Exception e) {
++            e.printStackTrace();
++            tr.rollback();
++        } finally {
++            s.close();
++        }
++
+     }
+ 
+     public Optional<Authentication> findByEmail(String email) {
+ 
++        Session s = sf.openSession();
++        Authentication authentication = null;
++
++        try {
++            String hql = "FROM Authentication a WHERE a.email = :email";
++
++            authentication = s.createQuery(hql, Authentication.class)
++                    .setParameter("email", email)
++                    .uniqueResult();
++
++        } catch (Exception e) {
++            e.printStackTrace();
++        } finally {
++            s.close();
++        }
++
++        return Optional.ofNullable(authentication);
+     }
+ }
+Index: lms/src/main/java/com/project/lms/Entity/Staff.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Entity;\r\n\r\nimport lombok.Data;\r\n\r\nimport javax.persistence.Entity;\r\nimport javax.persistence.Id;\r\nimport javax.persistence.OneToMany;\r\nimport javax.persistence.OneToOne;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n@Data\r\n@Entity\r\npublic class Staff {\r\n    @Id\r\n    private int staff_id;\r\n    private String name;\r\n\r\n    @OneToOne\r\n    private Authentication authentication;\r\n\r\n    @OneToMany\r\n    private Reservation reservation;\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/Staff.java b/lms/src/main/java/com/project/lms/Entity/Staff.java
+--- a/lms/src/main/java/com/project/lms/Entity/Staff.java	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/lms/src/main/java/com/project/lms/Entity/Staff.java	(date 1781539437425)
+@@ -2,10 +2,7 @@
+ 
+ import lombok.Data;
+ 
+-import javax.persistence.Entity;
+-import javax.persistence.Id;
+-import javax.persistence.OneToMany;
+-import javax.persistence.OneToOne;
++import jakarta.persistence.*;
+ import java.util.ArrayList;
+ import java.util.List;
+ @Data
+@@ -14,10 +11,11 @@
+     @Id
+     private int staff_id;
+     private String name;
++    private String address;
+ 
+     @OneToOne
+     private Authentication authentication;
+ 
+     @OneToMany
+-    private Reservation reservation;
++    private List<Reservation> reservation;
+ }
+Index: lms/src/main/java/com/project/lms/Entity/RefreshToken.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Entity;\r\n\r\nimport jakarta.persistence.*;\r\nimport lombok.AllArgsConstructor;\r\nimport lombok.Builder;\r\nimport lombok.Data;\r\nimport lombok.NoArgsConstructor;\r\n\r\nimport java.time.Instant;\r\n\r\n@Entity\r\n@Data\r\n@Builder\r\n@AllArgsConstructor\r\n@NoArgsConstructor\r\npublic class RefreshToken {\r\n\r\n    @Id\r\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n    private Long id;\r\n\r\n    @Column(unique = true, nullable = false)\r\n    private String token;\r\n\r\n    @Column(nullable = false)\r\n    private Instant expiryDate;\r\n\r\n    private boolean revoked;\r\n\r\n    @ManyToOne(fetch = FetchType.LAZY)\r\n    @JoinColumn(name = \"userid\", referencedColumnName = \"userid\")\r\n    private Authentication user;\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/RefreshToken.java b/lms/src/main/java/com/project/lms/Entity/RefreshToken.java
+--- a/lms/src/main/java/com/project/lms/Entity/RefreshToken.java	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/lms/src/main/java/com/project/lms/Entity/RefreshToken.java	(date 1781539437424)
+@@ -1,6 +1,11 @@
+ package com.project.lms.Entity;
+ 
+ import jakarta.persistence.*;
++
++import jakarta.persistence.Entity;
++import jakarta.persistence.GeneratedValue;
++import jakarta.persistence.GenerationType;
++import jakarta.persistence.Id;
+ import lombok.AllArgsConstructor;
+ import lombok.Builder;
+ import lombok.Data;
+@@ -28,6 +33,6 @@
+     private boolean revoked;
+ 
+     @ManyToOne(fetch = FetchType.LAZY)
+-    @JoinColumn(name = "userid", referencedColumnName = "userid")
++    @JoinColumn(name = "userid")
+     private Authentication user;
+ }
+Index: lms/src/main/java/com/project/lms/Dao/RefreshTokenDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Dao;\r\n\r\nimport com.project.lms.Entity.RefreshToken;\r\n\r\npublic class RefreshTokenDao {\r\n    public RefreshToken save(RefreshToken refreshToken) {\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Dao/RefreshTokenDao.java b/lms/src/main/java/com/project/lms/Dao/RefreshTokenDao.java
+--- a/lms/src/main/java/com/project/lms/Dao/RefreshTokenDao.java	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/lms/src/main/java/com/project/lms/Dao/RefreshTokenDao.java	(date 1781539437416)
+@@ -1,8 +1,37 @@
+ package com.project.lms.Dao;
+ 
+-import com.project.lms.Entity.RefreshToken;
++import com.project.lms.Entity.*;
++import org.hibernate.Session;
++import org.hibernate.SessionFactory;
++import org.hibernate.Transaction;
++import org.hibernate.cfg.Configuration;
++import org.springframework.stereotype.Repository;
+ 
++@Repository
+ public class RefreshTokenDao {
++    Configuration c=null;
++    SessionFactory sf=null;
++
++    public RefreshTokenDao(){
++        c=new Configuration();
++        c.addAnnotatedClass(Reservation.class);
++        c.addAnnotatedClass(Reader.class);
++        c.addAnnotatedClass(Books.class);
++        c.addAnnotatedClass(Staff.class);
++        c.addAnnotatedClass(Authentication.class);
++        sf= c.buildSessionFactory();
++    }
+     public RefreshToken save(RefreshToken refreshToken) {
++        Session session=sf.openSession();
++        Transaction tr= session.beginTransaction();
++
++        try{
++            session.persist(refreshToken);
++            tr.commit();
++        } catch (Exception e) {
++            e.printStackTrace();
++        }
++        return refreshToken;
++
+     }
+ }
+Index: lms/src/main/java/com/project/lms/Entity/Books.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Entity;\r\n\r\nimport lombok.AllArgsConstructor;\r\nimport lombok.Data;\r\nimport lombok.NoArgsConstructor;\r\n\r\n\r\nimport javax.persistence.*;\r\n\r\n@Entity\r\n@Data\r\n@NoArgsConstructor\r\n@AllArgsConstructor\r\npublic class Books {\r\n\r\n    @Id\r\n    private String isbn;\r\n\r\n    private String title;\r\n\r\n    private int edition;\r\n\r\n    private String authName;\r\n\r\n    private double price;\r\n\r\n    private String category;\r\n\r\n    private int quantity;\r\n\r\n    @ManyToOne\r\n    private Books books;\r\n\r\n    @ManyToOne\r\n    private Reader reader;\r\n\r\n    @OneToMany\r\n    private Reservation reservation;\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/Books.java b/lms/src/main/java/com/project/lms/Entity/Books.java
+--- a/lms/src/main/java/com/project/lms/Entity/Books.java	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/lms/src/main/java/com/project/lms/Entity/Books.java	(date 1781539437420)
+@@ -5,7 +5,9 @@
+ import lombok.NoArgsConstructor;
+ 
+ 
+-import javax.persistence.*;
++import jakarta.persistence.*;
++
++import java.util.List;
+ 
+ @Entity
+ @Data
+@@ -35,5 +37,5 @@
+     private Reader reader;
+ 
+     @OneToMany
+-    private Reservation reservation;
++    private List<Reservation> reservation;
+ }
+\ No newline at end of file
+Index: lms/src/main/java/com/project/lms/Service/StaffService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Service;\r\n\r\nimport com.project.lms.Dao.StaffDao;\r\nimport com.project.lms.Dto.ApiResponse;\r\nimport com.project.lms.Dto.StaffResponse;\r\nimport com.project.lms.Entity.Staff;\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.stereotype.Service;\r\n\r\nimport java.util.List;\r\nimport java.util.Optional;\r\n\r\n@Service\r\npublic class StaffService {\r\n\r\n    @Autowired\r\n    private StaffDao staffDao;\r\n\r\n    private StaffResponse toResponse(Staff staff) {\r\n        return new StaffResponse(\r\n                staff.getStaff_id(),\r\n                staff.getName()\r\n        );\r\n    }\r\n\r\n    public ApiResponse<List<StaffResponse>> getAllStaff() {\r\n\r\n        List<Staff> staffList = staffDao.findAll();\r\n\r\n        if (staffList.isEmpty())\r\n            return ApiResponse.fail(\"No staff found.\");\r\n\r\n        List<StaffResponse> res =\r\n                staffList.stream()\r\n                        .map(this::toResponse)\r\n                        .toList();\r\n\r\n        return ApiResponse.ok(\"All staff fetched.\", res);\r\n    }\r\n\r\n    public ApiResponse<StaffResponse> getStaffById(int id) {\r\n\r\n        Optional<Staff> staffOptional =\r\n                staffDao.findById(id);\r\n\r\n        if (staffOptional.isEmpty())\r\n            return ApiResponse.fail(\"Staff not found.\");\r\n\r\n        return ApiResponse.ok(\r\n                \"Staff fetched.\",\r\n                toResponse(staffOptional.get())\r\n        );\r\n    }\r\n\r\n    public ApiResponse<StaffResponse> addStaff(\r\n            StaffResponse res) {\r\n\r\n        Optional<Staff> existing =\r\n                staffDao.findById(res.getStaffId());\r\n\r\n        if (existing.isPresent())\r\n            return ApiResponse.fail(\"Staff already exists.\");\r\n\r\n        Staff staff = new Staff();\r\n        staff.setStaff_id(res.getStaffId());\r\n        staff.setName(res.getName());\r\n\r\n        staffDao.save(staff);\r\n\r\n        return ApiResponse.ok(\r\n                \"Staff added.\",\r\n                toResponse(staff)\r\n        );\r\n    }\r\n\r\n    public ApiResponse<StaffResponse> updateStaff(\r\n            int id,\r\n            StaffResponse res) {\r\n\r\n        Optional<Staff> staffOptional =\r\n                staffDao.findById(id);\r\n\r\n        if (staffOptional.isEmpty())\r\n            return ApiResponse.fail(\"Staff not found.\");\r\n\r\n        Staff staff = staffOptional.get();\r\n\r\n        if (res.getName() != null &&\r\n                !res.getName().isBlank()) {\r\n            staff.setName(res.getName());\r\n        }\r\n\r\n        staffDao.save(staff);\r\n\r\n        return ApiResponse.ok(\r\n                \"Staff updated.\",\r\n                toResponse(staff)\r\n        );\r\n    }\r\n\r\n    public ApiResponse<Void> deleteStaff(int id) {\r\n\r\n        Optional<Staff> staffOptional =\r\n                staffDao.findById(id);\r\n\r\n        if (staffOptional.isEmpty())\r\n            return ApiResponse.fail(\"Staff not found.\");\r\n\r\n        staffDao.deleteById(id);\r\n\r\n        return ApiResponse.ok(\r\n                \"Staff deleted.\",\r\n                null\r\n        );\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Service/StaffService.java b/lms/src/main/java/com/project/lms/Service/StaffService.java
+--- a/lms/src/main/java/com/project/lms/Service/StaffService.java	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/lms/src/main/java/com/project/lms/Service/StaffService.java	(date 1781539437427)
+@@ -52,26 +52,6 @@
+         );
+     }
+ 
+-    public ApiResponse<StaffResponse> addStaff(
+-            StaffResponse res) {
+-
+-        Optional<Staff> existing =
+-                staffDao.findById(res.getStaffId());
+-
+-        if (existing.isPresent())
+-            return ApiResponse.fail("Staff already exists.");
+-
+-        Staff staff = new Staff();
+-        staff.setStaff_id(res.getStaffId());
+-        staff.setName(res.getName());
+-
+-        staffDao.save(staff);
+-
+-        return ApiResponse.ok(
+-                "Staff added.",
+-                toResponse(staff)
+-        );
+-    }
+ 
+     public ApiResponse<StaffResponse> updateStaff(
+             int id,
+Index: lms/src/main/java/com/project/lms/Entity/Reservation.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Entity;\r\n\r\nimport lombok.*;\r\nimport javax.persistence.*;\r\nimport java.time.LocalDate;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\n@Entity\r\n@Data\r\n@NoArgsConstructor\r\n@AllArgsConstructor\r\npublic class Reservation {\r\n\r\n    @Id\r\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n    private Long reservationId;\r\n\r\n    @Column(nullable = false)\r\n    private String reservationType;\r\n\r\n    @ManyToOne\r\n    @JoinColumn(name = \"reader_id\")\r\n    private Reader reader;\r\n\r\n    @ManyToOne\r\n    @JoinColumn(name = \"isbn\")\r\n    private Books book;\r\n\r\n    @ManyToOne\r\n    @JoinColumn(name = \"staff_id\")\r\n    private Staff staff;\r\n\r\n    private LocalDate issueDate;\r\n\r\n    private LocalDate dueDate;\r\n\r\n    private LocalDate returnDate;\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/Reservation.java b/lms/src/main/java/com/project/lms/Entity/Reservation.java
+--- a/lms/src/main/java/com/project/lms/Entity/Reservation.java	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/lms/src/main/java/com/project/lms/Entity/Reservation.java	(date 1781539437425)
+@@ -1,7 +1,7 @@
+ package com.project.lms.Entity;
+ 
+ import lombok.*;
+-import javax.persistence.*;
++import jakarta.persistence.*;
+ import java.time.LocalDate;
+ import java.util.ArrayList;
+ import java.util.List;
+Index: lms/src/main/java/com/project/lms/Dao/ReservationDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Dao;\r\n\r\nimport com.project.lms.Entity.*;\r\nimport org.hibernate.SessionFactory;\r\nimport org.hibernate.cfg.Configuration;\r\nimport org.springframework.stereotype.Repository;\r\n\r\nimport java.util.Optional;\r\n\r\n@Repository\r\npublic class ReservationDao {\r\n    Configuration c=null;\r\n    SessionFactory sf=null;\r\n    public ReservationDao(){\r\n        c=new Configuration();\r\n        c.addAnnotatedClass(Reservation.class);\r\n        c.addAnnotatedClass(Reader.class);\r\n        c.addAnnotatedClass(Books.class);\r\n        c.addAnnotatedClass(Staff.class);\r\n        c.addAnnotatedClass(Authentication.class);\r\n        sf= c.buildSessionFactory();\r\n    }\r\n\r\n    public void save(Reservation reservation) {\r\n    }\r\n\r\n    public void deleteById(Long resid) {\r\n    }\r\n\r\n    public Optional<Reservation> findById(Long resid) {\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Dao/ReservationDao.java b/lms/src/main/java/com/project/lms/Dao/ReservationDao.java
+--- a/lms/src/main/java/com/project/lms/Dao/ReservationDao.java	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/lms/src/main/java/com/project/lms/Dao/ReservationDao.java	(date 1781539437418)
+@@ -1,7 +1,9 @@
+ package com.project.lms.Dao;
+ 
+ import com.project.lms.Entity.*;
++import org.hibernate.Session;
+ import org.hibernate.SessionFactory;
++import org.hibernate.Transaction;
+ import org.hibernate.cfg.Configuration;
+ import org.springframework.stereotype.Repository;
+ 
+@@ -22,6 +24,16 @@
+     }
+ 
+     public void save(Reservation reservation) {
++        Session session=sf.openSession();
++        Transaction tr= session.beginTransaction();
++        try {
++            session.persist(reservation);
++            tr.commit();
++        } catch (Exception e) {
++            e.printStackTrace();
++            tr.rollback();
++        }
++
+     }
+ 
+     public void deleteById(Long resid) {
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\r\n  <component name=\"MavenProjectsManager\">\r\n    <option name=\"originalFiles\">\r\n      <list>\r\n        <option value=\"$PROJECT_DIR$/lms/pom.xml\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_24\" default=\"true\" project-jdk-name=\"24\" project-jdk-type=\"JavaSDK\">\r\n    <output url=\"file://$PROJECT_DIR$/out\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/.idea/misc.xml	(date 1781539394111)
+@@ -8,7 +8,7 @@
+       </list>
+     </option>
+   </component>
+-  <component name="ProjectRootManager" version="2" languageLevel="JDK_24" default="true" project-jdk-name="24" project-jdk-type="JavaSDK">
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="24" project-jdk-type="JavaSDK">
+     <output url="file://$PROJECT_DIR$/out" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: lms/pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n\txsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd\">\r\n\t<modelVersion>4.0.0</modelVersion>\r\n\t<parent>\r\n\t\t<groupId>org.springframework.boot</groupId>\r\n\t\t<artifactId>spring-boot-starter-parent</artifactId>\r\n\t\t<version>4.1.0</version>\r\n\t\t<relativePath/> <!-- lookup parent from repository -->\r\n\t</parent>\r\n\t<groupId>com.project</groupId>\r\n\t<artifactId>lms</artifactId>\r\n\t<version>0.0.1-SNAPSHOT</version>\r\n\t<name>lms</name>\r\n\t<description/>\r\n\t<url/>\r\n\t<licenses>\r\n\t\t<license/>\r\n\t</licenses>\r\n\t<developers>\r\n\t\t<developer/>\r\n\t</developers>\r\n\t<scm>\r\n\t\t<connection/>\r\n\t\t<developerConnection/>\r\n\t\t<tag/>\r\n\t\t<url/>\r\n\t</scm>\r\n\t<properties>\r\n\t\t<java.version>17</java.version>\r\n\t</properties>\r\n\t<dependencies>\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.springframework.boot</groupId>\r\n\t\t\t<artifactId>spring-boot-starter-security</artifactId>\r\n\t\t</dependency>\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.springframework.boot</groupId>\r\n\t\t\t<artifactId>spring-boot-starter-webmvc</artifactId>\r\n\t\t</dependency>\r\n\r\n\t\t<dependency>\r\n\t\t\t<groupId>com.mysql</groupId>\r\n\t\t\t<artifactId>mysql-connector-j</artifactId>\r\n\t\t\t<scope>runtime</scope>\r\n\t\t</dependency>\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.projectlombok</groupId>\r\n\t\t\t<artifactId>lombok</artifactId>\r\n\t\t\t<optional>true</optional>\r\n\t\t</dependency>\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.springframework.boot</groupId>\r\n\t\t\t<artifactId>spring-boot-starter-data-jpa-test</artifactId>\r\n\t\t\t<scope>test</scope>\r\n\t\t</dependency>\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.springframework.boot</groupId>\r\n\t\t\t<artifactId>spring-boot-starter-security-test</artifactId>\r\n\t\t\t<scope>test</scope>\r\n\t\t</dependency>\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.springframework.boot</groupId>\r\n\t\t\t<artifactId>spring-boot-starter-webmvc-test</artifactId>\r\n\t\t\t<scope>test</scope>\r\n\t\t</dependency>\r\n        <dependency>\r\n            <groupId>io.jsonwebtoken</groupId>\r\n            <artifactId>jjwt-api</artifactId>\r\n\t\t\t<version>0.12.7</version>\r\n        </dependency>\r\n        <dependency>\r\n            <groupId>io.jsonwebtoken</groupId>\r\n            <artifactId>jjwt-impl</artifactId>\r\n\t\t\t<version>0.12.7</version>\r\n            <scope>runtime</scope>\r\n        </dependency>\r\n        <dependency>\r\n            <groupId>io.jsonwebtoken</groupId>\r\n            <artifactId>jjwt-jackson</artifactId>\r\n\t\t\t<version>0.12.7</version>\r\n            <scope>runtime</scope>\r\n        </dependency>\r\n\t\t<!-- Source: https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.hibernate</groupId>\r\n\t\t\t<artifactId>hibernate-core</artifactId>\r\n\t\t\t<version>5.6.15.Final</version>\r\n\t\t\t<scope>compile</scope>\r\n\t\t</dependency>\r\n        <dependency>\r\n            <groupId>jakarta.persistence</groupId>\r\n            <artifactId>jakarta.persistence-api</artifactId>\r\n        </dependency>\r\n    </dependencies>\r\n\r\n\t<build>\r\n\t\t<plugins>\r\n\t\t\t<plugin>\r\n\t\t\t\t<groupId>org.springframework.boot</groupId>\r\n\t\t\t\t<artifactId>spring-boot-maven-plugin</artifactId>\r\n\t\t\t\t<configuration>\r\n\t\t\t\t\t<excludes>\r\n\t\t\t\t\t\t<exclude>\r\n\t\t\t\t\t\t\t<groupId>org.projectlombok</groupId>\r\n\t\t\t\t\t\t\t<artifactId>lombok</artifactId>\r\n\t\t\t\t\t\t</exclude>\r\n\t\t\t\t\t</excludes>\r\n\t\t\t\t</configuration>\r\n\t\t\t</plugin>\r\n\t\t\t<plugin>\r\n\t\t\t\t<groupId>org.apache.maven.plugins</groupId>\r\n\t\t\t\t<artifactId>maven-compiler-plugin</artifactId>\r\n\t\t\t\t<executions>\r\n\t\t\t\t\t<execution>\r\n\t\t\t\t\t\t<id>default-compile</id>\r\n\t\t\t\t\t\t<phase>compile</phase>\r\n\t\t\t\t\t\t<goals>\r\n\t\t\t\t\t\t\t<goal>compile</goal>\r\n\t\t\t\t\t\t</goals>\r\n\t\t\t\t\t\t<configuration>\r\n\t\t\t\t\t\t\t<annotationProcessorPaths>\r\n\t\t\t\t\t\t\t\t<path>\r\n\t\t\t\t\t\t\t\t\t<groupId>org.projectlombok</groupId>\r\n\t\t\t\t\t\t\t\t\t<artifactId>lombok</artifactId>\r\n\t\t\t\t\t\t\t\t</path>\r\n\t\t\t\t\t\t\t</annotationProcessorPaths>\r\n\t\t\t\t\t\t</configuration>\r\n\t\t\t\t\t</execution>\r\n\t\t\t\t\t<execution>\r\n\t\t\t\t\t\t<id>default-testCompile</id>\r\n\t\t\t\t\t\t<phase>test-compile</phase>\r\n\t\t\t\t\t\t<goals>\r\n\t\t\t\t\t\t\t<goal>testCompile</goal>\r\n\t\t\t\t\t\t</goals>\r\n\t\t\t\t\t\t<configuration>\r\n\t\t\t\t\t\t\t<annotationProcessorPaths>\r\n\t\t\t\t\t\t\t\t<path>\r\n\t\t\t\t\t\t\t\t\t<groupId>org.projectlombok</groupId>\r\n\t\t\t\t\t\t\t\t\t<artifactId>lombok</artifactId>\r\n\t\t\t\t\t\t\t\t</path>\r\n\t\t\t\t\t\t\t</annotationProcessorPaths>\r\n\t\t\t\t\t\t</configuration>\r\n\t\t\t\t\t</execution>\r\n\t\t\t\t</executions>\r\n\t\t\t\t<configuration>\r\n\t\t\t\t\t<source>21</source>\r\n\t\t\t\t\t<target>21</target>\r\n\t\t\t\t\t<compilerArgs>--enable-preview</compilerArgs>\r\n\t\t\t\t</configuration>\r\n\t\t\t</plugin>\r\n\t\t</plugins>\r\n\t</build>\r\n\r\n</project>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/pom.xml b/lms/pom.xml
+--- a/lms/pom.xml	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/lms/pom.xml	(date 1781539437414)
+@@ -1,155 +1,107 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0"
++         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
++         https://maven.apache.org/xsd/maven-4.0.0.xsd">
++
+ 	<modelVersion>4.0.0</modelVersion>
++
+ 	<parent>
+ 		<groupId>org.springframework.boot</groupId>
+ 		<artifactId>spring-boot-starter-parent</artifactId>
+-		<version>4.1.0</version>
+-		<relativePath/> <!-- lookup parent from repository -->
++		<version>3.5.4</version>
++		<relativePath/>
+ 	</parent>
++
+ 	<groupId>com.project</groupId>
+ 	<artifactId>lms</artifactId>
+ 	<version>0.0.1-SNAPSHOT</version>
+ 	<name>lms</name>
+-	<description/>
+-	<url/>
+-	<licenses>
+-		<license/>
+-	</licenses>
+-	<developers>
+-		<developer/>
+-	</developers>
+-	<scm>
+-		<connection/>
+-		<developerConnection/>
+-		<tag/>
+-		<url/>
+-	</scm>
++
+ 	<properties>
+-		<java.version>17</java.version>
++		<java.version>21</java.version>
+ 	</properties>
++
+ 	<dependencies>
++
++		<!-- Spring Web -->
++		<dependency>
++			<groupId>org.springframework.boot</groupId>
++			<artifactId>spring-boot-starter-web</artifactId>
++		</dependency>
++
++		<!-- Spring Security -->
+ 		<dependency>
+ 			<groupId>org.springframework.boot</groupId>
+ 			<artifactId>spring-boot-starter-security</artifactId>
+ 		</dependency>
++
++		<!-- Spring Data JPA (Hibernate) -->
+ 		<dependency>
+ 			<groupId>org.springframework.boot</groupId>
+-			<artifactId>spring-boot-starter-webmvc</artifactId>
++			<artifactId>spring-boot-starter-data-jpa</artifactId>
+ 		</dependency>
+ 
++		<!-- MySQL -->
+ 		<dependency>
+ 			<groupId>com.mysql</groupId>
+ 			<artifactId>mysql-connector-j</artifactId>
+ 			<scope>runtime</scope>
+ 		</dependency>
++
++		<!-- Lombok -->
+ 		<dependency>
+ 			<groupId>org.projectlombok</groupId>
+ 			<artifactId>lombok</artifactId>
+ 			<optional>true</optional>
+ 		</dependency>
++
++		<!-- JWT -->
+ 		<dependency>
+-			<groupId>org.springframework.boot</groupId>
+-			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
+-			<scope>test</scope>
+-		</dependency>
+-		<dependency>
+-			<groupId>org.springframework.boot</groupId>
+-			<artifactId>spring-boot-starter-security-test</artifactId>
+-			<scope>test</scope>
+-		</dependency>
+-		<dependency>
+-			<groupId>org.springframework.boot</groupId>
+-			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+-			<scope>test</scope>
+-		</dependency>
+-        <dependency>
+-            <groupId>io.jsonwebtoken</groupId>
+-            <artifactId>jjwt-api</artifactId>
++			<groupId>io.jsonwebtoken</groupId>
++			<artifactId>jjwt-api</artifactId>
+ 			<version>0.12.7</version>
+-        </dependency>
+-        <dependency>
+-            <groupId>io.jsonwebtoken</groupId>
+-            <artifactId>jjwt-impl</artifactId>
++		</dependency>
++
++		<dependency>
++			<groupId>io.jsonwebtoken</groupId>
++			<artifactId>jjwt-impl</artifactId>
+ 			<version>0.12.7</version>
+-            <scope>runtime</scope>
+-        </dependency>
+-        <dependency>
+-            <groupId>io.jsonwebtoken</groupId>
+-            <artifactId>jjwt-jackson</artifactId>
++			<scope>runtime</scope>
++		</dependency>
++
++		<dependency>
++			<groupId>io.jsonwebtoken</groupId>
++			<artifactId>jjwt-jackson</artifactId>
+ 			<version>0.12.7</version>
+-            <scope>runtime</scope>
+-        </dependency>
+-		<!-- Source: https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
++			<scope>runtime</scope>
++		</dependency>
++
++		<!-- Tests -->
+ 		<dependency>
+-			<groupId>org.hibernate</groupId>
+-			<artifactId>hibernate-core</artifactId>
+-			<version>5.6.15.Final</version>
+-			<scope>compile</scope>
++			<groupId>org.springframework.boot</groupId>
++			<artifactId>spring-boot-starter-test</artifactId>
++			<scope>test</scope>
+ 		</dependency>
+-        <dependency>
+-            <groupId>jakarta.persistence</groupId>
+-            <artifactId>jakarta.persistence-api</artifactId>
+-        </dependency>
+-    </dependencies>
++
++		<dependency>
++			<groupId>org.springframework.security</groupId>
++			<artifactId>spring-security-test</artifactId>
++			<scope>test</scope>
++		</dependency>
++
++	</dependencies>
+ 
+ 	<build>
+ 		<plugins>
++
+ 			<plugin>
+ 				<groupId>org.springframework.boot</groupId>
+ 				<artifactId>spring-boot-maven-plugin</artifactId>
+-				<configuration>
+-					<excludes>
+-						<exclude>
+-							<groupId>org.projectlombok</groupId>
+-							<artifactId>lombok</artifactId>
+-						</exclude>
+-					</excludes>
+-				</configuration>
+-			</plugin>
+-			<plugin>
+-				<groupId>org.apache.maven.plugins</groupId>
+-				<artifactId>maven-compiler-plugin</artifactId>
+-				<executions>
+-					<execution>
+-						<id>default-compile</id>
+-						<phase>compile</phase>
+-						<goals>
+-							<goal>compile</goal>
+-						</goals>
+-						<configuration>
+-							<annotationProcessorPaths>
+-								<path>
+-									<groupId>org.projectlombok</groupId>
+-									<artifactId>lombok</artifactId>
+-								</path>
+-							</annotationProcessorPaths>
+-						</configuration>
+-					</execution>
+-					<execution>
+-						<id>default-testCompile</id>
+-						<phase>test-compile</phase>
+-						<goals>
+-							<goal>testCompile</goal>
+-						</goals>
+-						<configuration>
+-							<annotationProcessorPaths>
+-								<path>
+-									<groupId>org.projectlombok</groupId>
+-									<artifactId>lombok</artifactId>
+-								</path>
+-							</annotationProcessorPaths>
+-						</configuration>
+-					</execution>
+-				</executions>
+-				<configuration>
+-					<source>21</source>
+-					<target>21</target>
+-					<compilerArgs>--enable-preview</compilerArgs>
+-				</configuration>
+ 			</plugin>
++
+ 		</plugins>
+ 	</build>
+ 
+ </project>
++
+Index: lms/src/main/java/com/project/lms/Entity/Publisher.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Entity;\r\n\r\nimport lombok.AllArgsConstructor;\r\nimport lombok.Data;\r\nimport lombok.NoArgsConstructor;\r\n\r\nimport javax.persistence.CascadeType;\r\nimport javax.persistence.Entity;\r\nimport javax.persistence.Id;\r\nimport javax.persistence.OneToMany;\r\nimport java.util.List;\r\n\r\n@Entity\r\n@Data\r\n@NoArgsConstructor\r\n@AllArgsConstructor\r\npublic class Publisher {\r\n\r\n    @Id\r\n    private int publisher_id;\r\n    private int yearOfPublication;\r\n    private String name;\r\n\r\n    @OneToMany\r\n    private List<Books> books;\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/Publisher.java b/lms/src/main/java/com/project/lms/Entity/Publisher.java
+--- a/lms/src/main/java/com/project/lms/Entity/Publisher.java	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/lms/src/main/java/com/project/lms/Entity/Publisher.java	(date 1781539437421)
+@@ -4,10 +4,7 @@
+ import lombok.Data;
+ import lombok.NoArgsConstructor;
+ 
+-import javax.persistence.CascadeType;
+-import javax.persistence.Entity;
+-import javax.persistence.Id;
+-import javax.persistence.OneToMany;
++import jakarta.persistence.*;
+ import java.util.List;
+ 
+ @Entity
+Index: lms/src/main/java/com/project/lms/Entity/Reader.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.project.lms.Entity;\r\n\r\nimport lombok.*;\r\n\r\n\r\nimport javax.persistence.*;\r\nimport java.util.List;\r\n\r\n@Entity\r\n@Data\r\n@NoArgsConstructor\r\n@AllArgsConstructor\r\npublic class Reader {\r\n\r\n    @Id\r\n    private Long userId;\r\n\r\n    private String name;\r\n\r\n    private String address;\r\n\r\n    @ElementCollection\r\n    private List<String> phones;\r\n\r\n    @OneToMany(mappedBy = \"reader\")\r\n    private List<Books> books;\r\n\r\n    @OneToOne\r\n    private Authentication authentication;\r\n\r\n    @OneToMany\r\n    private Reservation reservation;\r\n\r\n}\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/lms/src/main/java/com/project/lms/Entity/Reader.java b/lms/src/main/java/com/project/lms/Entity/Reader.java
+--- a/lms/src/main/java/com/project/lms/Entity/Reader.java	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/lms/src/main/java/com/project/lms/Entity/Reader.java	(date 1781539437422)
+@@ -3,7 +3,7 @@
+ import lombok.*;
+ 
+ 
+-import javax.persistence.*;
++import jakarta.persistence.*;
+ import java.util.List;
+ 
+ @Entity
+@@ -29,7 +29,7 @@
+     private Authentication authentication;
+ 
+     @OneToMany
+-    private Reservation reservation;
++    private List<Reservation> reservation;
+ 
+ }
+ 
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"4caf10f8-3d63-433b-a6f3-647a2e7eb226\" name=\"Changes\" comment=\"Merge branch 'main' of https://github.com/shetty141106/Library-Management-System&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml\">\r\n      <change afterPath=\"$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/RefreshTokenDao.java\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/LoginRequest.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/AuthController.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/AuthController.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/AuthDao.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/AuthDao.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/ReaderResponse.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/ReaderResponse.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Authentication.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Authentication.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/AuthService.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/AuthService.java\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\">{\r\n  &quot;lastFilter&quot;: {\r\n    &quot;state&quot;: &quot;OPEN&quot;,\r\n    &quot;assignee&quot;: &quot;Atharvsurya&quot;\r\n  }\r\n}</component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/shetty141106/Library-Management-System.git&quot;,\r\n    &quot;accountId&quot;: &quot;6f03f2a8-d06a-4ef5-8939-8f6807521876&quot;\r\n  }\r\n}</component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 1\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"3F1MbJkwizx8cG2s7m2wVvJKPLv\" />\r\n  <component name=\"ProjectLevelVcsManager\">\r\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,\r\n    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,\r\n    &quot;git-widget-placeholder&quot;: &quot;main&quot;,\r\n    &quot;ignore.preview.features.used&quot;: &quot;true&quot;,\r\n    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,\r\n    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,\r\n    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,\r\n    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,\r\n    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,\r\n    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;\r\n  },\r\n  &quot;keyToStringList&quot;: {\r\n    &quot;ChangesTree.GroupingKeys&quot;: [\r\n      &quot;repository&quot;\r\n    ]\r\n  }\r\n}</component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CreateClassDialog.RecentsKey\">\r\n      <recent name=\"com.project.lms.Security\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\">\r\n    <configuration default=\"true\" type=\"JetRunConfigurationType\">\r\n      <module name=\"Library-Management-System\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration default=\"true\" type=\"KotlinStandaloneScriptRunConfigurationType\">\r\n      <module name=\"Library-Management-System\" />\r\n      <option name=\"filePath\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"4caf10f8-3d63-433b-a6f3-647a2e7eb226\" name=\"Changes\" comment=\"\" />\r\n      <created>1781238191362</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1781238191362</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1781338585958</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1781338585958</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"Merge branch 'main' of https://github.com/shetty141106/Library-Management-System&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1781448342345</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1781448342345</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"3\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State>\r\n              <option name=\"SHOW_DETAILS_IN_CHANGES\" value=\"false\" />\r\n            </State>\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 49afd22e45acf32cebf2e9e7c5834184ef57d677)
++++ b/.idea/workspace.xml	(date 1781539507332)
+@@ -5,14 +5,21 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="4caf10f8-3d63-433b-a6f3-647a2e7eb226" name="Changes" comment="Merge branch 'main' of https://github.com/shetty141106/Library-Management-System&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml">
+-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/RefreshTokenDao.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/LoginRequest.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/AuthController.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/lms/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/lms/pom.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/AuthDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/AuthDao.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/ReaderResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dto/ReaderResponse.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/RefreshTokenDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/RefreshTokenDao.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/ReservationDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/ReservationDao.java" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Authentication.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Authentication.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Books.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Books.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Publisher.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Publisher.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Reader.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Reader.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/RefreshToken.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/RefreshToken.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Reservation.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Reservation.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Staff.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Entity/Staff.java" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/AuthService.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/StaffService.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/StaffService.java" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -52,28 +59,28 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent">{
+-  &quot;keyToString&quot;: {
+-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+-    &quot;ignore.preview.features.used&quot;: &quot;true&quot;,
+-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+-    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;
++  <component name="PropertiesComponent"><![CDATA[{
++  "keyToString": {
++    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
++    "ModuleVcsDetector.initialDetectionPerformed": "true",
++    "RunOnceActivity.ShowReadmeOnStart": "true",
++    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
++    "RunOnceActivity.git.unshallow": "true",
++    "git-widget-placeholder": "Merging main",
++    "ignore.preview.features.used": "true",
++    "ignore.virus.scanning.warn.message": "true",
++    "kotlin-language-version-configured": "true",
++    "project.structure.last.edited": "Modules",
++    "project.structure.proportion": "0.15",
++    "project.structure.side.proportion": "0.2",
++    "settings.editor.selected.configurable": "MavenSettings"
+   },
+-  &quot;keyToStringList&quot;: {
+-    &quot;ChangesTree.GroupingKeys&quot;: [
+-      &quot;repository&quot;
++  "keyToStringList": {
++    "ChangesTree.GroupingKeys": [
++      "repository"
+     ]
+   }
+-}</component>
++}]]></component>
+   <component name="RecentsManager">
+     <key name="CreateClassDialog.RecentsKey">
+       <recent name="com.project.lms.Security" />

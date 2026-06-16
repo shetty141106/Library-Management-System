@@ -7,6 +7,8 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public class ReservationDao {
     Configuration c=null;
@@ -32,5 +34,11 @@ public class ReservationDao {
             tr.rollback();
         }
 
+    }
+
+    public void deleteById(Long resid) {
+    }
+
+    public Optional<Reservation> findById(Long resid) {
     }
 }

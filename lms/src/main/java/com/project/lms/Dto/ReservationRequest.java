@@ -1,8 +1,5 @@
 package com.project.lms.Dto;
 
-import com.project.lms.Entity.Books;
-import com.project.lms.Entity.Reader;
-import com.project.lms.Entity.Staff;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
