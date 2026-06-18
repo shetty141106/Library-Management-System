@@ -38,4 +38,8 @@ public class Books {
 
     @OneToMany
     private List<Reservation> reservation;
+
+    @ManyToOne
+    @JoinColumn(name = "publisher_id")
+    private Publisher publisher;
 }

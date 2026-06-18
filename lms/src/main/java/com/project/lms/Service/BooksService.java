@@ -5,6 +5,7 @@ import com.project.lms.Dto.BooksRequest;
 import com.project.lms.Dto.BooksResponse;
 import com.project.lms.Entity.Books;
 import com.project.lms.Dao.BooksDao;
+import com.project.lms.Entity.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +57,9 @@ public class BooksService {
         Optional<Books> booksOptional = booksDao.findById(bookreq.getIsbn());
         if (booksOptional.isPresent())
             return ApiResponse.fail("Book with this Isbn already exists.");
+        Publisher pub = new Publisher();
+        pub.setName(bookreq.getPublisherName());
+        pub.setYearOfPublication(bookreq.getYearOfPublication());
         Books books = new Books();
         books.setIsbn(bookreq.getIsbn());
         books.setTitle(bookreq.getTitle());
@@ -63,6 +67,7 @@ public class BooksService {
         books.setAuthName(bookreq.getAuthName());
         books.setPrice(bookreq.getPrice());
         books.setCategory(bookreq.getCategory());
+        books.setPublisher(pub);
         booksDao.save(books);
         return ApiResponse.ok("Book Added.", toBookResponse(books));
     }

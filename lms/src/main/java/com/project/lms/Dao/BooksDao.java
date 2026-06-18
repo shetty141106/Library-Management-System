@@ -3,6 +3,7 @@ package com.project.lms.Dao;
 import com.project.lms.Entity.Authentication;
 import com.project.lms.Entity.Books;
 import com.project.lms.Entity.Reader;
+import com.project.lms.Utility.HibernateUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -16,16 +17,7 @@ import java.util.Optional;
 @Repository
 public class BooksDao  {
 
-    Configuration cfg=null;
-    SessionFactory sf = null;
-
-    public BooksDao(){
-        this.cfg=new Configuration();
-        cfg.addAnnotatedClass(Books.class);
-        cfg.addAnnotatedClass(Reader.class);
-        cfg.addAnnotatedClass(Authentication.class);
-        this.sf=cfg.buildSessionFactory();
-    }
+    private final SessionFactory sf = HibernateUtil.getSessionFactory();
 
     public Books save(Books book) {
         Session s=sf.openSession();

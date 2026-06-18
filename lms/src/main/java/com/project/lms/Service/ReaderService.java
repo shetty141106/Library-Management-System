@@ -18,6 +18,7 @@ public class ReaderService {
 
     private ReaderResponse toReaderResponse(Reader reader) {
         return new ReaderResponse(
+                reader.getUserId(),
                 reader.getName(),
                 reader.getAuthentication().getEmail(),
                 reader.getAddress(),

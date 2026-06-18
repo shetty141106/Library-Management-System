@@ -1,8 +1,9 @@
 package com.project.lms.Dto;
 
-import com.project.lms.Entity.Reader;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -15,4 +16,6 @@ public class BooksRequest {
     private double price;
     private String category;
     private int Quantity;
+    private String publisherName;
+    private int yearOfPublication;
 }

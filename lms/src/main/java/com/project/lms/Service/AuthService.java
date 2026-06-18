@@ -47,60 +47,60 @@ public class AuthService {
         return refreshTokenDao.save(refreshToken);
     }
 
-    private ReaderResponse toReaderResponse (Reader reader, String accessToken, String refreshToken){
+    private ReaderResponse toReaderResponse (Staff staff, String accessToken, String refreshToken){
         return ReaderResponse.builder()
-                .name(reader.getName())
-                .email(reader.getAuthentication().getEmail())
-                .address(reader.getAddress())
-                .phones(reader.getPhones())
+                .id(staff.getStaff_id())
+                .name(staff.getName())
+                .email(staff.getAuthentication().getEmail())
+                .address(staff.getAddress())
                 .build();
     }
 
-//    public ApiResponse<ReaderResponse> register(RegisterRequest req) {
-//        Optional<Authentication> opt = authDao.findByEmail(req.getEmail());
-//        if(opt.isPresent())
-//            return ApiResponse.fail("User already exists.");
-//
-//        if(req.getName().isBlank() || req.getEmail().isBlank() || req.getAddress().isBlank() || req.getPhones().isEmpty() || req.getPassword().isBlank() || req.getConfirm_password().isBlank())
-//            return ApiResponse.fail("All fields are required.");
-//        if(!req.getPassword().equals(req.getConfirm_password()))
-//            return ApiResponse.fail("Password do not match.");
-//
-//        Authentication auth = new Authentication();
-//        auth.setEmail(req.getEmail());
-//        auth.setPassword(passwordEncoder.encode(req.getPassword()));
-//
-//        Staff staff=new Staff();
-//        staff.setName(req.getName());
-//        staff.setAddress(req.getAddress());
-//
-//        auth.setStaff(staff);
-//        staff.setAuthentication(auth);
-//        authDao.save(auth);
-//
-//        String jwtToken = jwtService.generateToken(auth);
-//        RefreshToken refreshToken = createRefreshToken(auth);
-//        return ApiResponse.ok("Registration Successful.", toReaderResponse(reader, jwtToken, refreshToken.getToken()));
-//    }
-//
-//    public ApiResponse<ReaderResponse> login(LoginRequest req) {
-//        Optional<Authentication> opt = authDao.findByEmail(req.getEmail());
-//        if(opt.isEmpty())
-//            return ApiResponse.fail("User not found.");
-//        Authentication auth = opt.get();
-//
-//        try{
-//            authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(auth.getEmail(), req.getPassword())
-//            );
-//        }
-//        catch (Exception e){
-//            return ApiResponse.fail("Invalid email or password.");
-//        }
-//        String jwtToken = jwtService.generateToken(auth);
-//        RefreshToken refreshToken = createRefreshToken(auth);
-//        return ApiResponse.ok("Login Successful.", toReaderResponse(auth.getReader(), jwtToken, refreshToken.getToken()));
-//    }
+    public ApiResponse<ReaderResponse> register(RegisterRequest req) {
+        Optional<Authentication> opt = authDao.findByEmail(req.getEmail());
+        if(opt.isPresent())
+            return ApiResponse.fail("User already exists.");
+
+        if(req.getName().isBlank() || req.getEmail().isBlank() || req.getAddress().isBlank() || req.getPhones().isEmpty() || req.getPassword().isBlank() || req.getConfirm_password().isBlank())
+            return ApiResponse.fail("All fields are required.");
+        if(!req.getPassword().equals(req.getConfirm_password()))
+            return ApiResponse.fail("Password do not match.");
+
+        Authentication auth = new Authentication();
+        auth.setEmail(req.getEmail());
+        auth.setPassword(passwordEncoder.encode(req.getPassword()));
+
+        Staff staff=new Staff();
+        staff.setName(req.getName());
+        staff.setAddress(req.getAddress());
+
+        auth.setStaff(staff);
+        staff.setAuthentication(auth);
+        authDao.save(auth);
+
+        String jwtToken = jwtService.generateToken(auth);
+        RefreshToken refreshToken = createRefreshToken(auth);
+        return ApiResponse.ok("Registration Successful.", toReaderResponse(staff, jwtToken, refreshToken.getToken()));
+    }
+
+    public ApiResponse<ReaderResponse> login(LoginRequest req) {
+        Optional<Authentication> opt = authDao.findByEmail(req.getEmail());
+        if(opt.isEmpty())
+            return ApiResponse.fail("User not found.");
+        Authentication auth = opt.get();
+
+        try{
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(auth.getEmail(), req.getPassword())
+            );
+        }
+        catch (Exception e){
+            return ApiResponse.fail("Invalid email or password.");
+        }
+        String jwtToken = jwtService.generateToken(auth);
+        RefreshToken refreshToken = createRefreshToken(auth);
+        return ApiResponse.ok("Login Successful.", toReaderResponse(auth.getStaff(), jwtToken, refreshToken.getToken()));
+    }
 
     public ApiResponse<Void> updatePassword(UpdatePasswordRequest req) {
         if(req.getEmail().isBlank())

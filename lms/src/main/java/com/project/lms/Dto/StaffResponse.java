@@ -7,6 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class StaffResponse {
 
-    private int staffId;
+    private Long staffId;
     private String name;
 }

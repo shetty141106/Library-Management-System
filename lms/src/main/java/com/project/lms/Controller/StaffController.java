@@ -39,18 +39,6 @@ public class StaffController {
                 : ResponseEntity.badRequest().body(res);
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<StaffResponse>>
-    addStaff(@RequestBody StaffResponse response) {
-
-        ApiResponse<StaffResponse> res =
-                staffService.addStaff(response);
-
-        return res.isSuccess()
-                ? ResponseEntity.ok(res)
-                : ResponseEntity.badRequest().body(res);
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<StaffResponse>>
     updateStaff(
