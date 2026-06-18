@@ -12,15 +12,6 @@ public class HibernateUtil {
         try {
             Configuration c = new Configuration();
 
-            // Database configuration credentials defined ONCE
-            c.setProperty("hibernate.connection.driver_class", "com.mysql.cj.jdbc.Driver");
-            c.setProperty("hibernate.connection.url", "jdbc:mysql://gateway01.ap-southeast-1.prod.alicloud.tidbcloud.com:4000/lms-db");
-            c.setProperty("hibernate.connection.username", "49t2jbFnL9xeerB.root");
-            c.setProperty("hibernate.connection.password", "RWmgggaZOOwo0Gc8");
-            c.setProperty("hibernate.hbm2ddl.auto", "update");
-            c.setProperty("hibernate.show_sql", "true");
-            c.setProperty("hibernate.format_sql", "true");
-
             // Add all your entity classes here as your project grows
             c.addAnnotatedClass(Authentication.class);
             c.addAnnotatedClass(Reader.class);
