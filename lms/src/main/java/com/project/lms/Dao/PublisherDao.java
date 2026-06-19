@@ -72,4 +72,7 @@ public class PublisherDao {
             s.close();
         }
     }
+
+    public Optional<Publisher> findByName(String publisherName) {
+    }
 }

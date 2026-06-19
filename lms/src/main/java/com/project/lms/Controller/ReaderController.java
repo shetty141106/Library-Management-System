@@ -2,6 +2,7 @@ package com.project.lms.Controller;
 
 import com.project.lms.Dto.ApiResponse;
 import com.project.lms.Dto.ReaderResponse;
+import com.project.lms.Dto.UserResponse;
 import com.project.lms.Entity.Reader;
 import com.project.lms.Service.ReaderService;
 

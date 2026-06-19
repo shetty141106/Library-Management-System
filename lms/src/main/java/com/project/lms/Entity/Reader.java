@@ -17,20 +17,15 @@ public class Reader {
 
     private String name;
 
+    private String email;
+
     private String address;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> phones;
 
-    @OneToMany(mappedBy = "reader")
-    private List<Books> books;
-
-    @OneToOne
-    private Authentication authentication;
-
-    @OneToMany
+    @OneToMany(mappedBy = "reader", cascade = CascadeType.ALL)
     private List<Reservation> reservation;
-
 }
 
 

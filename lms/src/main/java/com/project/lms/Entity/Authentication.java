@@ -25,8 +25,12 @@ public class Authentication implements UserDetails {
     private String email;
     private String password;
 
-    @OneToOne(mappedBy = "authentication", cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "staff_id")
     private Staff staff;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<RefreshToken> refToken;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

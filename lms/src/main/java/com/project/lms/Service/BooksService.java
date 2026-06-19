@@ -1,5 +1,6 @@
 package com.project.lms.Service;
 
+import com.project.lms.Dao.PublisherDao;
 import com.project.lms.Dto.ApiResponse;
 import com.project.lms.Dto.BooksRequest;
 import com.project.lms.Dto.BooksResponse;
@@ -17,6 +18,9 @@ public class BooksService {
 
     @Autowired
     private BooksDao booksDao;
+
+    @Autowired
+    private PublisherDao pubdao;
 
     private BooksResponse toBookResponse(Books books) {
         return new BooksResponse(
@@ -58,6 +62,7 @@ public class BooksService {
         if (booksOptional.isPresent())
             return ApiResponse.fail("Book with this Isbn already exists.");
         Publisher pub = new Publisher();
+        Optional<Publisher> optPub = pubdao.findByName(bookreq.getPublisherName());
         pub.setName(bookreq.getPublisherName());
         pub.setYearOfPublication(bookreq.getYearOfPublication());
         Books books = new Books();
@@ -67,6 +72,7 @@ public class BooksService {
         books.setAuthName(bookreq.getAuthName());
         books.setPrice(bookreq.getPrice());
         books.setCategory(bookreq.getCategory());
+        books.setQuantity(bookreq.getQuantity());
         books.setPublisher(pub);
         booksDao.save(books);
         return ApiResponse.ok("Book Added.", toBookResponse(books));

@@ -9,13 +9,17 @@ import java.util.List;
 @Entity
 public class Staff {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long staff_id;
     private String name;
     private String address;
 
-    @OneToOne
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> phones;
+
+    @OneToOne(mappedBy = "staff", cascade = CascadeType.ALL)
     private Authentication authentication;
 
-    @OneToMany
+    @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL)
     private List<Reservation> reservation;
 }

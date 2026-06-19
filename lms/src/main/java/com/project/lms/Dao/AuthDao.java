@@ -25,8 +25,8 @@ public class AuthDao {
             s.persist(auth);
             tr.commit();
         } catch (Exception e) {
-            e.printStackTrace();
             tr.rollback();
+            throw new RuntimeException("Failed to save to database: " + e.getMessage(), e);
         } finally {
             s.close();
         }

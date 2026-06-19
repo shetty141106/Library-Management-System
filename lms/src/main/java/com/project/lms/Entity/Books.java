@@ -30,16 +30,11 @@ public class Books {
 
     private int quantity;
 
-    @ManyToOne
-    private Books books;
 
-    @ManyToOne
-    private Reader reader;
-
-    @OneToMany
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<Reservation> reservation;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "publisher_id")
     private Publisher publisher;
 }

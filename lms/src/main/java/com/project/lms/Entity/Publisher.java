@@ -14,11 +14,12 @@ import java.util.List;
 public class Publisher {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int publisher_id;
     private int yearOfPublication;
     private String name;
 
-    @OneToMany
+    @OneToMany(mappedBy = "publisher", cascade = CascadeType.ALL)
     private List<Books> books;
 
 }

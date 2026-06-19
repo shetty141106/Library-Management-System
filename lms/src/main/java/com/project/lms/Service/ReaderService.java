@@ -2,6 +2,7 @@ package com.project.lms.Service;
 
 import com.project.lms.Dto.ApiResponse;
 import com.project.lms.Dto.ReaderResponse;
+import com.project.lms.Dto.UserResponse;
 import com.project.lms.Entity.Reader;
 import com.project.lms.Dao.ReaderDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class ReaderService {
         return new ReaderResponse(
                 reader.getUserId(),
                 reader.getName(),
-                reader.getAuthentication().getEmail(),
+                reader.getEmail(),
                 reader.getAddress(),
                 reader.getPhones()
         );

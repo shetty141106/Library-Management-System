@@ -3,8 +3,6 @@ package com.project.lms.Entity;
 import lombok.*;
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Data
@@ -19,15 +17,15 @@ public class Reservation {
     @Column(nullable = false)
     private String reservationType;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "reader_id")
     private Reader reader;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "isbn")
     private Books book;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "staff_id")
     private Staff staff;
 

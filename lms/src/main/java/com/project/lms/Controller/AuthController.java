@@ -15,14 +15,14 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<ReaderResponse>> register(@RequestBody RegisterRequest req) {
-        ApiResponse<ReaderResponse> res = authService.register(req);
+    public ResponseEntity<ApiResponse<UserResponse>> register(@RequestBody RegisterRequest req) {
+        ApiResponse<UserResponse> res = authService.register(req);
         return res.isSuccess()? ResponseEntity.ok(res):ResponseEntity.badRequest().body(res);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<ReaderResponse>> login(@RequestBody LoginRequest req) {
-        ApiResponse<ReaderResponse> res = authService.login(req);
+    public ResponseEntity<ApiResponse<UserResponse>> login(@RequestBody LoginRequest req) {
+        ApiResponse<UserResponse> res = authService.login(req);
         return res.isSuccess()? ResponseEntity.ok(res):ResponseEntity.badRequest().body(res);
     }
 

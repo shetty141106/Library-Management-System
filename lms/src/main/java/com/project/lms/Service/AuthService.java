@@ -4,7 +4,6 @@ import com.project.lms.Dao.AuthDao;
 import com.project.lms.Dao.RefreshTokenDao;
 import com.project.lms.Dto.*;
 import com.project.lms.Entity.Authentication;
-import com.project.lms.Entity.Reader;
 import com.project.lms.Entity.RefreshToken;
 import com.project.lms.Entity.Staff;
 import com.project.lms.Security.JwtService;
@@ -47,16 +46,18 @@ public class AuthService {
         return refreshTokenDao.save(refreshToken);
     }
 
-    private ReaderResponse toReaderResponse (Staff staff, String accessToken, String refreshToken){
-        return ReaderResponse.builder()
+    private UserResponse toUserResponse (Staff staff, String accessToken){
+        return UserResponse.builder()
                 .id(staff.getStaff_id())
                 .name(staff.getName())
                 .email(staff.getAuthentication().getEmail())
                 .address(staff.getAddress())
+                .phones(staff.getPhones())
+                .accessToken(accessToken)
                 .build();
     }
 
-    public ApiResponse<ReaderResponse> register(RegisterRequest req) {
+    public ApiResponse<UserResponse> register(RegisterRequest req) {
         Optional<Authentication> opt = authDao.findByEmail(req.getEmail());
         if(opt.isPresent())
             return ApiResponse.fail("User already exists.");
@@ -73,17 +74,17 @@ public class AuthService {
         Staff staff=new Staff();
         staff.setName(req.getName());
         staff.setAddress(req.getAddress());
-
+        staff.setPhones(req.getPhones());
         auth.setStaff(staff);
         staff.setAuthentication(auth);
         authDao.save(auth);
 
         String jwtToken = jwtService.generateToken(auth);
         RefreshToken refreshToken = createRefreshToken(auth);
-        return ApiResponse.ok("Registration Successful.", toReaderResponse(staff, jwtToken, refreshToken.getToken()));
+        return ApiResponse.ok("Registration Successful.", toUserResponse(staff, jwtToken));
     }
 
-    public ApiResponse<ReaderResponse> login(LoginRequest req) {
+    public ApiResponse<UserResponse> login(LoginRequest req) {
         Optional<Authentication> opt = authDao.findByEmail(req.getEmail());
         if(opt.isEmpty())
             return ApiResponse.fail("User not found.");
@@ -99,7 +100,7 @@ public class AuthService {
         }
         String jwtToken = jwtService.generateToken(auth);
         RefreshToken refreshToken = createRefreshToken(auth);
-        return ApiResponse.ok("Login Successful.", toReaderResponse(auth.getStaff(), jwtToken, refreshToken.getToken()));
+        return ApiResponse.ok("Login Successful.", toUserResponse(auth.getStaff(), jwtToken));
     }
 
     public ApiResponse<Void> updatePassword(UpdatePasswordRequest req) {

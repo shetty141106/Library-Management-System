@@ -33,6 +33,6 @@ public class RefreshToken {
     private boolean revoked;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userid")
+    @JoinColumn(name = "userId")
     private Authentication user;
 }

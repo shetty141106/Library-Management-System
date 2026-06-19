@@ -19,7 +19,10 @@ public class StaffService {
     private StaffResponse toResponse(Staff staff) {
         return new StaffResponse(
                 staff.getStaff_id(),
-                staff.getName()
+                staff.getName(),
+                staff.getAuthentication().getEmail(),
+                staff.getAddress(),
+                staff.getPhones()
         );
     }
 
