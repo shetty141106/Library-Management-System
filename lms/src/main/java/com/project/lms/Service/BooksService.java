@@ -61,10 +61,7 @@ public class BooksService {
         Optional<Books> booksOptional = booksDao.findById(bookreq.getIsbn());
         if (booksOptional.isPresent())
             return ApiResponse.fail("Book with this Isbn already exists.");
-        Publisher pub = new Publisher();
         Optional<Publisher> optPub = pubdao.findByName(bookreq.getPublisherName());
-        pub.setName(bookreq.getPublisherName());
-        pub.setYearOfPublication(bookreq.getYearOfPublication());
         Books books = new Books();
         books.setIsbn(bookreq.getIsbn());
         books.setTitle(bookreq.getTitle());
@@ -73,7 +70,14 @@ public class BooksService {
         books.setPrice(bookreq.getPrice());
         books.setCategory(bookreq.getCategory());
         books.setQuantity(bookreq.getQuantity());
-        books.setPublisher(pub);
+        if(optPub.isPresent())
+            books.setPublisher(optPub.get());
+        else{
+            Publisher pub = new Publisher();
+            pub.setName(bookreq.getPublisherName());
+            pub.setYearOfPublication(bookreq.getYearOfPublication());
+            books.setPublisher(pub);
+        }
         booksDao.save(books);
         return ApiResponse.ok("Book Added.", toBookResponse(books));
     }

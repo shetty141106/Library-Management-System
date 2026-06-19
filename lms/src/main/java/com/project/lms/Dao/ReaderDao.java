@@ -1,16 +1,10 @@
 package com.project.lms.Dao;
 
-import com.project.lms.Entity.Authentication;
-import com.project.lms.Entity.Books;
 import com.project.lms.Entity.Reader;
 import com.project.lms.Utility.HibernateUtil;
-import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
