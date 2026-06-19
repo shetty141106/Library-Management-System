@@ -30,6 +30,8 @@ public class Books {
 
     private int quantity;
 
+    private int yearOfPublication;
+
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<Reservation> reservation;

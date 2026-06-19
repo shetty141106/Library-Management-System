@@ -24,7 +24,7 @@ public class BooksService {
 
     private BooksResponse toBookResponse(Books books) {
         return new BooksResponse(
-                books.getIsbn(), books.getTitle(), books.getEdition(), books.getAuthName(), books.getPrice(), books.getCategory(),books.getQuantity()
+                books.getIsbn(), books.getTitle(), books.getEdition(), books.getAuthName(), books.getPrice(), books.getCategory(),books.getQuantity(), books.getPublisher().getName(), books.getYearOfPublication()
         );
     }
 
@@ -70,12 +70,12 @@ public class BooksService {
         books.setPrice(bookreq.getPrice());
         books.setCategory(bookreq.getCategory());
         books.setQuantity(bookreq.getQuantity());
+        books.setYearOfPublication(bookreq.getYearOfPublication());
         if(optPub.isPresent())
             books.setPublisher(optPub.get());
         else{
             Publisher pub = new Publisher();
             pub.setName(bookreq.getPublisherName());
-            pub.setYearOfPublication(bookreq.getYearOfPublication());
             books.setPublisher(pub);
         }
         booksDao.save(books);
@@ -97,6 +97,8 @@ public class BooksService {
             existingBook.setCategory(bookreq.getCategory());
         if (bookreq.getPrice() != 0)
             existingBook.setPrice(bookreq.getPrice());
+        if(bookreq.getYearOfPublication() > 0)
+            existingBook.setYearOfPublication(bookreq.getYearOfPublication());
         booksDao.save(existingBook);
         return ApiResponse.ok("Book updated.", toBookResponse(existingBook));
     }

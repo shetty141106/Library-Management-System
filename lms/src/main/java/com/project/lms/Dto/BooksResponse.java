@@ -13,4 +13,6 @@ public class BooksResponse {
     private double price;
     private String category;
     private int Quantity;
+    private String publisherName;
+    private int yearOfPublication;
 }

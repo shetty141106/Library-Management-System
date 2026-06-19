@@ -19,7 +19,6 @@ public class PublisherService {
     private PublisherResponse toPublisherResponse(Publisher publisher) {
         return new PublisherResponse(
                 publisher.getPublisher_id(),
-                publisher.getYearOfPublication(),
                 publisher.getName(),
                 publisher.getBooks()
         );
@@ -91,12 +90,6 @@ public class PublisherService {
         if (publisher.getName() != null &&
                 !publisher.getName().isBlank()) {
             existingPublisher.setName(publisher.getName());
-        }
-
-        if (publisher.getYearOfPublication() > 0) {
-            existingPublisher.setYearOfPublication(
-                    publisher.getYearOfPublication()
-            );
         }
 
         if (publisher.getBooks() != null &&

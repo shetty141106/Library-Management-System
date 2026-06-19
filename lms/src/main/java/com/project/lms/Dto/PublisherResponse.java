@@ -10,7 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 public class PublisherResponse {
     private int publisher_id;
-    private int yearOfPublication;
     private String name;
     private List<Books> books;
 }
