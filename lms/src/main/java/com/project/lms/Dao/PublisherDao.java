@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -72,7 +73,23 @@ public class PublisherDao {
             s.close();
         }
     }
-
     public Optional<Publisher> findByName(String publisherName) {
+        Session s = sf.openSession();
+
+        try {
+            Query<Publisher> query = s.createQuery(
+                    "FROM Publisher p WHERE p.name = :name",
+                    Publisher.class);
+
+            query.setParameter("name", publisherName);
+
+            Publisher publisher = query.uniqueResult();
+
+            return Optional.ofNullable(publisher);
+
+        } finally {
+            s.close();
+        }
     }
-}
+    }
+
