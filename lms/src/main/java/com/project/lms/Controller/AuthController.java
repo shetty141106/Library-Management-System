@@ -32,4 +32,9 @@ public class AuthController {
         return res.isSuccess()? ResponseEntity.ok(res):ResponseEntity.badRequest().body(res);
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<?>> refresh(@RequestBody RefreshTokenRequest req) {
+        ApiResponse<?> res = authService.refresh(req);
+        return res.isSuccess()? ResponseEntity.ok(res):ResponseEntity.badRequest().body(res);
+    }
 }

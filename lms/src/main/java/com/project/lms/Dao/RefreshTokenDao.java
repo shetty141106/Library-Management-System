@@ -8,6 +8,8 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public class RefreshTokenDao {
     private final SessionFactory sf = HibernateUtil.getSessionFactory();
@@ -23,5 +25,19 @@ public class RefreshTokenDao {
         }
         return refreshToken;
 
+    }
+
+    public Optional<RefreshToken> findByToken(String refreshTokenString) {
+        try (Session session = sf.openSession()) {
+            String hql = "FROM RefreshToken rt WHERE rt.token = :tokenParam";
+            RefreshToken foundToken = session.createQuery(hql, RefreshToken.class)
+                    .setParameter("tokenParam", refreshTokenString)
+                    .uniqueResult();
+            return Optional.ofNullable(foundToken);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
     }
 }

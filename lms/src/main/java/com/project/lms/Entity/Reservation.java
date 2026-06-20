@@ -25,7 +25,7 @@ public class Reservation {
     @JoinColumn(name = "isbn")
     private Books book;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "staff_id")
     private Staff staff;
 

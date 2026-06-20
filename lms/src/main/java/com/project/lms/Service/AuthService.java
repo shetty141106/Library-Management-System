@@ -8,12 +8,17 @@ import com.project.lms.Entity.RefreshToken;
 import com.project.lms.Entity.Staff;
 import com.project.lms.Security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,6 +40,9 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserDetailsService userDetailsService;
+
     private RefreshToken createRefreshToken(Authentication auth) {
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(auth)
@@ -46,7 +54,7 @@ public class AuthService {
         return refreshTokenDao.save(refreshToken);
     }
 
-    private UserResponse toUserResponse (Staff staff, String accessToken){
+    private UserResponse toUserResponse(Staff staff, String accessToken) {
         return UserResponse.builder()
                 .id(staff.getStaff_id())
                 .name(staff.getName())
@@ -59,19 +67,19 @@ public class AuthService {
 
     public ApiResponse<UserResponse> register(RegisterRequest req) {
         Optional<Authentication> opt = authDao.findByEmail(req.getEmail());
-        if(opt.isPresent())
+        if (opt.isPresent())
             return ApiResponse.fail("User already exists.");
 
-        if(req.getName().isBlank() || req.getEmail().isBlank() || req.getAddress().isBlank() || req.getPhones().isEmpty() || req.getPassword().isBlank() || req.getConfirm_password().isBlank())
+        if (req.getName().isBlank() || req.getEmail().isBlank() || req.getAddress().isBlank() || req.getPhones().isEmpty() || req.getPassword().isBlank() || req.getConfirm_password().isBlank())
             return ApiResponse.fail("All fields are required.");
-        if(!req.getPassword().equals(req.getConfirm_password()))
+        if (!req.getPassword().equals(req.getConfirm_password()))
             return ApiResponse.fail("Password do not match.");
 
         Authentication auth = new Authentication();
         auth.setEmail(req.getEmail());
         auth.setPassword(passwordEncoder.encode(req.getPassword()));
 
-        Staff staff=new Staff();
+        Staff staff = new Staff();
         staff.setName(req.getName());
         staff.setAddress(req.getAddress());
         staff.setPhones(req.getPhones());
@@ -86,16 +94,15 @@ public class AuthService {
 
     public ApiResponse<UserResponse> login(LoginRequest req) {
         Optional<Authentication> opt = authDao.findByEmail(req.getEmail());
-        if(opt.isEmpty())
+        if (opt.isEmpty())
             return ApiResponse.fail("User not found.");
         Authentication auth = opt.get();
 
-        try{
+        try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(auth.getEmail(), req.getPassword())
             );
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return ApiResponse.fail("Invalid email or password.");
         }
         String jwtToken = jwtService.generateToken(auth);
@@ -104,16 +111,46 @@ public class AuthService {
     }
 
     public ApiResponse<Void> updatePassword(UpdatePasswordRequest req) {
-        if(req.getEmail().isBlank())
+        if (req.getEmail().isBlank())
             return ApiResponse.fail("Email is required.");
         Optional<Authentication> opt = authDao.findByEmail(req.getEmail());
-        if(opt.isEmpty())
+        if (opt.isEmpty())
             return ApiResponse.fail("User not found.");
         Authentication auth = opt.get();
-        if(!passwordEncoder.matches(auth.getPassword(), req.getOld_password()))
+        if (!passwordEncoder.matches(auth.getPassword(), req.getOld_password()))
             return ApiResponse.fail("Enter valid password.");
         auth.setPassword(passwordEncoder.encode(req.getPassword()));
         authDao.save(auth);
         return ApiResponse.ok("Password updated.", null);
+    }
+
+    public ApiResponse<?> refresh(RefreshTokenRequest req) {
+        Optional<RefreshToken> tokenOpt = refreshTokenDao.findByToken(req.getRefreshToken());
+
+        if (tokenOpt.isEmpty()) {
+            return ApiResponse.fail("Session expired. Please login again.");
+        }
+
+        RefreshToken validToken = tokenOpt.get();
+
+        if (validToken.getExpiryDate().isBefore(java.time.Instant.now())) {
+            return ApiResponse.fail("Refresh token has expired. Please login again.");
+        }
+
+        try {
+            String username = validToken.getUser().getUsername();
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            String newAccessToken = jwtService.generateToken(userDetails);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("accessToken", newAccessToken);
+            response.put("refreshToken", req.getRefreshToken());
+
+            return ApiResponse.ok("RefreshToken Valid", response);
+
+        } catch (Exception e) {
+            return ApiResponse.fail("An error occurred while generating the token: " + e.getMessage());
+        }
     }
 }

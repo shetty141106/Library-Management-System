@@ -29,7 +29,7 @@ public class StaffController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<StaffResponse>>
-    getStaffById(@PathVariable int id) {
+    getStaffById(@PathVariable Long id) {
 
         ApiResponse<StaffResponse> res =
                 staffService.getStaffById(id);
@@ -42,7 +42,7 @@ public class StaffController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<StaffResponse>>
     updateStaff(
-            @PathVariable int id,
+            @PathVariable Long id,
             @RequestBody StaffResponse response) {
 
         ApiResponse<StaffResponse> res =
@@ -55,7 +55,7 @@ public class StaffController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>>
-    deleteStaff(@PathVariable int id) {
+    deleteStaff(@PathVariable Long id) {
 
         ApiResponse<Void> res =
                 staffService.deleteStaff(id);

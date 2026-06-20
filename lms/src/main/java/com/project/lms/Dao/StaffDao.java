@@ -31,7 +31,7 @@ public class StaffDao {
         }
     }
 
-    public Optional<Staff> findById(int id) {
+    public Optional<Staff> findById(Long id) {
 
         Session s = sf.openSession();
 
@@ -64,7 +64,7 @@ public class StaffDao {
         }
     }
 
-    public void deleteById(int id) {
+    public void deleteById(Long id) {
 
         Session s = sf.openSession();
         Transaction tr = s.beginTransaction();

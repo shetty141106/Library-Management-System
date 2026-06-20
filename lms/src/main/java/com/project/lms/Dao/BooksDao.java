@@ -25,7 +25,7 @@ public class BooksDao  {
         Transaction tr=s.beginTransaction();
         try {
 
-            s.persist(book);
+            s.merge(book);
             flag=true;
         }
         catch (HibernateException e) {

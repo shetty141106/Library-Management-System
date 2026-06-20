@@ -12,6 +12,6 @@ import java.time.LocalDate;
 public class ReservationRequest {
     private Long userid;
     private String isbn;
-    private String staff;
+    private Long staffId;
     private LocalDate returnDate;
 }

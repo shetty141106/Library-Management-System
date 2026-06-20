@@ -16,6 +16,8 @@ public class Publisher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int publisher_id;
+
+    @Column(unique = true)
     private String name;
 
     @OneToMany(mappedBy = "publisher", cascade = CascadeType.ALL)

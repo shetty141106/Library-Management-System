@@ -41,7 +41,7 @@ public class StaffService {
         return ApiResponse.ok("All staff fetched.", res);
     }
 
-    public ApiResponse<StaffResponse> getStaffById(int id) {
+    public ApiResponse<StaffResponse> getStaffById(Long id) {
 
         Optional<Staff> staffOptional =
                 staffDao.findById(id);
@@ -57,7 +57,7 @@ public class StaffService {
 
 
     public ApiResponse<StaffResponse> updateStaff(
-            int id,
+            Long id,
             StaffResponse res) {
 
         Optional<Staff> staffOptional =
@@ -81,7 +81,7 @@ public class StaffService {
         );
     }
 
-    public ApiResponse<Void> deleteStaff(int id) {
+    public ApiResponse<Void> deleteStaff(Long id) {
 
         Optional<Staff> staffOptional =
                 staffDao.findById(id);
