@@ -49,7 +49,8 @@ public class SecurityConfig {
         // Add your frontend URLs here (Local Vite AND deployed React app)
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://library-management-system-0g2d.onrender.com/" // Update this if you host your frontend!
+                "https://library-management-system-0g2d.onrender.com/",
+                "https://library-management-system-two-lime.vercel.app/"
         ));
 
         // Allow common HTTP methods
