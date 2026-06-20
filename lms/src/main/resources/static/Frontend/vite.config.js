@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "http://localhost:8080",
+        target: "https://library-management-system-0g2d.onrender.com",
         changeOrigin: true
       }
     }
