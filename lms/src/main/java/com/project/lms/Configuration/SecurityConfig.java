@@ -3,6 +3,7 @@ package com.project.lms.Configuration;
 import com.project.lms.Security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer; // <-- IMPORT ADDED
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
@@ -28,10 +29,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+               .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "https://library-management-system-0g2d.onrender.com/**","/static/**", "/", "/error", "/index.html", "/Frontend/**", "favicon.ico","/assets/**" ).permitAll()
-                        // 2. Lock down everything else
+                        .requestMatchers("/api/auth/**", "/static/**", "/", "/error", "/index.html", "/Frontend/**", "favicon.ico", "/assets/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -46,25 +47,16 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Add your frontend URLs here (Local Vite AND deployed React app)
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://library-management-system-0g2d.onrender.com/",
-                "https://library-management-system-two-lime.vercel.app/",
-                "https://librarymanagementsystem-rjsd.onrender.com/"
+                "https://library-management-system-0g2d.onrender.com",
+                "https://library-management-system-two-lime.vercel.app",
+                "https://librarymanagementsystem-rjsd.onrender.com"
         ));
-
-        // Allow common HTTP methods
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        // Allow headers required for JWT and JSON
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-
-        // Required if you are sending credentials/cookies (often needed with JWTs)
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // Apply this CORS configuration to all API endpoints
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
