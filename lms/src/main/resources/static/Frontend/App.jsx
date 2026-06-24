@@ -22,6 +22,13 @@ const emptyBook = {
   yearOfPublication: new Date().getFullYear()
 };
 
+const emptyReservation = {
+  readerId: "",
+  readerName: "",
+  readerPhones: "",
+  isbn: ""
+};
+
 const API_URL =
   import.meta.env.VITE_API_URL || "https://library-management-system-0g2d.onrender.com";
 
@@ -56,6 +63,9 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [reservations, setReservations] = useState([]);
+  const [resForm, setResForm] = useState(emptyReservation);
+  const [resLoading, setResLoading] = useState(false);
 
   const token = session?.accessToken;
 
@@ -222,6 +232,60 @@ function App() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function issueReservation(event) {
+    event.preventDefault();
+    setResLoading(true);
+    setError("");
+    setNotice("");
+    try {
+      const response = await request("/api/reservation/issue", {
+        method: "POST",
+        body: JSON.stringify({
+          readerId: Number(resForm.readerId),
+          readerName: resForm.readerName,
+          readerPhones: resForm.readerPhones
+            .split(",")
+            .map((phone) => phone.trim())
+            .filter(Boolean),
+          isbn: resForm.isbn,
+          staffId: session.id
+        })
+      });
+      setNotice(response.message);
+      setReservations((prev) => [response.data, ...prev]);
+      setResForm(emptyReservation);
+      await loadBooks();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setResLoading(false);
+    }
+  }
+
+  async function returnReservation(reservationId) {
+    setResLoading(true);
+    setError("");
+    setNotice("");
+    try {
+      const response = await request(`/api/reservation/return/${reservationId}`, {
+        method: "POST"
+      });
+      setNotice(response.message);
+      setReservations((prev) =>
+        prev.map((res) =>
+          res.reservationId === reservationId
+            ? { ...res, reservation_type: "RETURNED" }
+            : res
+        )
+      );
+      await loadBooks();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setResLoading(false);
     }
   }
 
@@ -500,6 +564,110 @@ function App() {
                   <tr>
                     <td colSpan="7" className="empty">
                       {loading ? "Loading catalog..." : "No books found."}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section className="workspace">
+        <form onSubmit={issueReservation} className="book-form surface">
+          <div className="section-title">
+            <div>
+              <p className="eyebrow">Reservations</p>
+              <h2>Issue book</h2>
+            </div>
+          </div>
+
+          <label>
+            Reader ID
+            <input
+              type="number"
+              value={resForm.readerId}
+              onChange={(event) => setResForm({ ...resForm, readerId: event.target.value })}
+              required
+            />
+          </label>
+          <label>
+            Reader name
+            <input
+              value={resForm.readerName}
+              onChange={(event) => setResForm({ ...resForm, readerName: event.target.value })}
+            />
+          </label>
+          <label className="full">
+            Reader phones
+            <input
+              value={resForm.readerPhones}
+              onChange={(event) => setResForm({ ...resForm, readerPhones: event.target.value })}
+              placeholder="9876543210, 9123456780"
+            />
+          </label>
+          <label>
+            ISBN
+            <input
+              value={resForm.isbn}
+              onChange={(event) => setResForm({ ...resForm, isbn: event.target.value })}
+              required
+            />
+          </label>
+
+          <button className="primary" disabled={resLoading}>
+            {resLoading ? "Please wait..." : "Issue book"}
+          </button>
+        </form>
+
+        <section className="catalog surface">
+          <div className="catalog-header">
+            <div>
+              <p className="eyebrow">Reservation dashboard</p>
+              <h2>Active reservations</h2>
+              <p className="muted">{reservations.length} reservations this session</p>
+            </div>
+          </div>
+
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Res. ID</th>
+                  <th>Book</th>
+                  <th>Reader</th>
+                  <th>Staff</th>
+                  <th>Issue date</th>
+                  <th>Due date</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {reservations.map((res) => (
+                  <tr key={res.reservationId}>
+                    <td>{res.reservationId}</td>
+                    <td>{res.book}</td>
+                    <td>{res.userid}</td>
+                    <td>{res.staff}</td>
+                    <td>{res.issueDate}</td>
+                    <td>{res.dueDate}</td>
+                    <td>
+                      <span className="tag">{res.reservation_type}</span>
+                    </td>
+                    <td className="row-actions">
+                      {res.reservation_type === "ISSUED" && (
+                        <button onClick={() => returnReservation(res.reservationId)} disabled={resLoading}>
+                          Return
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {!reservations.length && (
+                  <tr>
+                    <td colSpan="8" className="empty">
+                      No reservations yet.
                     </td>
                   </tr>
                 )}
