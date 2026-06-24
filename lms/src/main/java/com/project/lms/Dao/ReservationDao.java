@@ -26,6 +26,7 @@ public class ReservationDao {
         } catch (Exception e) {
             e.printStackTrace();
             tr.rollback();
+            return null;
         }
     }
 
