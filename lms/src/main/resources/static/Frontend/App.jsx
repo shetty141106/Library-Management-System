@@ -109,6 +109,7 @@ function App() {
     if (session) {
       localStorage.setItem("lms-session", JSON.stringify(session));
       loadBooks();
+      loadReservations();
     } else {
       localStorage.removeItem("lms-session");
     }
@@ -153,6 +154,19 @@ function App() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  }
+
+async function loadReservations() {
+    if (!token) return;
+    setResLoading(true);
+    try {
+      const response = await request("/api/reservation");
+      setReservations(response.data || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setResLoading(false);
     }
   }
 

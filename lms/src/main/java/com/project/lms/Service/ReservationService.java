@@ -7,16 +7,18 @@ import com.project.lms.Dao.StaffDao;
 import com.project.lms.Dto.ApiResponse;
 import com.project.lms.Dto.ReservationRequest;
 import com.project.lms.Dto.ReservationResponse;
+import com.project.lms.Dto.StaffResponse;
 import com.project.lms.Entity.Books;
 import com.project.lms.Entity.Reader;
 import com.project.lms.Entity.Reservation;
 import com.project.lms.Entity.Staff;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ReservationService {
@@ -103,5 +105,19 @@ public class ReservationService {
         reservation.setReturnDate(LocalDate.now());
         reservationDao.save(reservation);
         return ApiResponse.ok("Book returned.", null);
+    }
+
+    public ApiResponse<List<ReservationResponse>> getAllReservations() {
+        try {
+            List<Reservation> allReservations = reservationDao.findAll();
+            List<ReservationResponse> res =
+                    allReservations.stream()
+                            .map(this::toResponse)
+                            .toList();
+
+            return ApiResponse.ok("Reservations fetched.", res);
+        } catch (Exception e) {
+            return ApiResponse.fail("message"+e.getMessage());
+        }
     }
 }

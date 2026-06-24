@@ -88,4 +88,16 @@ public class ReservationDao {
         }
 
     }
+
+    public List<Reservation> findAll() {
+        Session session = sf.openSession();
+        try {
+            return session.createQuery("FROM Reservation", Reservation.class).getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+           return java.util.Collections.emptyList();
+        } finally {
+            session.close();
+        }
+    }
 }
