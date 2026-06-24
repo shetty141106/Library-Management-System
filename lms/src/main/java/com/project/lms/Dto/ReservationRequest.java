@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -16,5 +15,4 @@ public class ReservationRequest {
     private List<String> readerPhones;
     private String isbn;
     private Long staffId;
-    private LocalDate returnDate;
 }

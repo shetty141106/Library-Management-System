@@ -70,7 +70,6 @@ public class ReservationService {
 
         reservation.setBook(book);
         reservation.setIssueDate(LocalDate.now());
-        reservation.setReturnDate(req.getReturnDate());
         reservation.setDueDate(LocalDate.now().plusDays(14));
         reservation.setStaff(staffOpt.get());
         book.setQuantity(book.getQuantity()-1);
@@ -91,6 +90,7 @@ public class ReservationService {
         book.setQuantity(book.getQuantity()+1);
         reservation.setReservationType("RETURNED");
         reservation.setBook(book);
+        reservation.setReturnDate(LocalDate.now());
         reservationDao.save(reservation);
         return ApiResponse.ok("Book returned.", null);
     }
