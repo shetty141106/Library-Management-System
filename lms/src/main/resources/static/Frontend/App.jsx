@@ -17,7 +17,7 @@ const emptyBook = {
   authName: "",
   price: 0,
   category: "",
-  Quantity: 1,
+  quantity: 1,
   publisherName: "",
   yearOfPublication: new Date().getFullYear()
 };
@@ -70,12 +70,12 @@ function App() {
       .filter((book) => activeCategory === "All" || book.category === activeCategory)
       .filter((book) => {
         if (!term) return true;
-        return [book.isbn, book.title, book.authName, book.category, book.Quantity, book.publisherName]
+        return [book.isbn, book.title, book.authName, book.category, book.quantity, book.publisherName]
           .filter(Boolean)
           .some((value) => String(value).toLowerCase().includes(term));
       })
       .sort((a, b) => {
-        if (sortBy === "quantity") return Number(b.Quantity || 0) - Number(a.Quantity || 0);
+        if (sortBy === "quantity") return Number(b.quantity || 0) - Number(a.quantity || 0);
         if (sortBy === "price") return Number(b.price || 0) - Number(a.price || 0);
         if (sortBy === "year") {
           return Number(b.yearOfPublication || 0) - Number(a.yearOfPublication || 0);
@@ -86,9 +86,9 @@ function App() {
 
   const stats = useMemo(() => {
     const categorySet = new Set(books.map((book) => book.category).filter(Boolean));
-    const copies = books.reduce((total, book) => total + Number(book.Quantity || 0), 0);
+    const copies = books.reduce((total, book) => total + Number(book.quantity || 0), 0);
     const value = books.reduce(
-      (total, book) => total + Number(book.price || 0) * Number(book.Quantity || 0),
+      (total, book) => total + Number(book.price || 0) * Number(book.quantity || 0),
       0
     );
     const averagePrice = books.length ? value / Math.max(copies, 1) : 0;
@@ -194,7 +194,7 @@ function App() {
           confirm_isbn: bookForm.confirm_isbn || bookForm.isbn,
           edition: Number(bookForm.edition),
           price: Number(bookForm.price),
-          Quantity: Number(bookForm.Quantity),
+          quantity: Number(bookForm.quantity),
           yearOfPublication: Number(bookForm.yearOfPublication)
         })
       });
@@ -407,7 +407,7 @@ function App() {
           <Field label="Publisher" name="publisherName" form={bookForm} setForm={setBookForm} />
           <Field label="Edition" name="edition" type="number" form={bookForm} setForm={setBookForm} />
           <Field label="Price" name="price" type="number" form={bookForm} setForm={setBookForm} />
-          <Field label="Quantity" name="Quantity" type="number" form={bookForm} setForm={setBookForm} />
+          <Field label="Quantity" name="quantity" type="number" form={bookForm} setForm={setBookForm} />
           <Field
             label="Publication year"
             name="yearOfPublication"
@@ -486,7 +486,7 @@ function App() {
                     <td>
                       <span className="tag">{book.category || "Unsorted"}</span>
                     </td>
-                    <td>{book.Quantity}</td>
+                    <td>{book.quantity}</td>
                     <td>Rs. {Number(book.price || 0).toFixed(2)}</td>
                     <td className="row-actions">
                       <button onClick={() => startEdit(book)}>Edit</button>
