@@ -398,20 +398,38 @@ label {
 }
 
 .status {
-  animation: slideIn 0.24s ease both;
-  border-radius: 6px;
-  font-weight: 700;
-  padding: 10px 12px;
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  padding: 16px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  max-width: 400px;
+  animation: slideInToast 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .status.success {
-  background: #e7f7ef;
-  color: #116149;
+  background-color: #f0fdf4;
+  color: #166534;
+  border-left: 6px solid #22c55e;
 }
 
 .status.error {
-  background: #fff1f0;
-  color: #b42318;
+  background-color: #fef2f2;
+  color: #991b1b;
+}
+
+@keyframes slideInToast {
+  0% {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .table-wrap {

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4caf10f8-3d63-433b-a6f3-647a2e7eb226" name="Changes" comment="getAllReservations endpoint added">
+    <list default="true" id="4caf10f8-3d63-433b-a6f3-647a2e7eb226" name="Changes" comment="Frontend Fixed">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lms/src/main/resources/static/Frontend/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/resources/static/Frontend/App.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lms/src/main/resources/static/Frontend/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/resources/static/Frontend/styles.css" afterDir="false" />
@@ -173,7 +173,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782319562360</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Frontend Fixed">
+      <option name="closed" value="true" />
+      <created>1782320692947</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1782320692947</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -198,6 +206,7 @@
     <MESSAGE value="Session expired frontend bug solved" />
     <MESSAGE value="Quantity bug solved" />
     <MESSAGE value="getAllReservations endpoint added" />
-    <option name="LAST_COMMIT_MESSAGE" value="getAllReservations endpoint added" />
+    <MESSAGE value="Frontend Fixed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Frontend Fixed" />
   </component>
 </project>

@@ -42,7 +42,7 @@ function getStoredSession() {
 
 async function parseApiResponse(response) {
   const payload = await response.json().catch(() => null);
-  if (!response.ok || payload?.success === false) {
+  if (!response.ok || payload?.status === "fail" || payload?.success === false) {
     throw new Error(payload?.message || "Request failed.");
   }
   return payload;
@@ -295,6 +295,7 @@ async function loadReservations() {
             : res
         )
       );
+      await loadReservations();
       await loadBooks();
     } catch (err) {
       setError(err.message);
