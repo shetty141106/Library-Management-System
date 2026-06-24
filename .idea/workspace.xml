@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4caf10f8-3d63-433b-a6f3-647a2e7eb226" name="Changes" comment="Modified Issue and Return book reservation">
+    <list default="true" id="4caf10f8-3d63-433b-a6f3-647a2e7eb226" name="Changes" comment="Bugs in Issue and Return book reservation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/ReservationDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/ReservationDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/ReservationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/StaffService.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/StaffService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -133,7 +132,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782294791457</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Bugs in Issue and Return book reservation">
+      <option name="closed" value="true" />
+      <created>1782295869078</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1782295869078</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -153,6 +160,7 @@
     <MESSAGE value="Commited" />
     <MESSAGE value="??" />
     <MESSAGE value="Modified Issue and Return book reservation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Modified Issue and Return book reservation" />
+    <MESSAGE value="Bugs in Issue and Return book reservation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Bugs in Issue and Return book reservation" />
   </component>
 </project>

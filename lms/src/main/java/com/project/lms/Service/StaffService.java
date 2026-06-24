@@ -3,6 +3,7 @@ package com.project.lms.Service;
 import com.project.lms.Dao.StaffDao;
 import com.project.lms.Dto.ApiResponse;
 import com.project.lms.Dto.StaffResponse;
+import com.project.lms.Entity.Authentication;
 import com.project.lms.Entity.Staff;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,7 +73,10 @@ public class StaffService {
                 !res.getName().isBlank()) {
             staff.setName(res.getName());
         }
-
+        if(res.getAddress() != null && !res.getAddress().isBlank())
+            staff.setAddress(res.getAddress());
+        if(res.getPhones() != null && !res.getPhones().isEmpty())
+            staff.setPhones(res.getPhones());
         staffDao.save(staff);
 
         return ApiResponse.ok(
