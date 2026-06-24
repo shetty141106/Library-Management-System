@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -45,24 +46,32 @@ public class ReservationService {
         if (req.getIsbn() == null || req.getReaderId() == null) {
             return ApiResponse.fail("Book ID and Reader ID are required.");
         }
+
+        boolean bookAlreadyIssued = resdao.isBookAlreadyIssuedToReader(req.getIsbn(), req.getReaderId());
+        if(bookAlreadyIssued)
+            return ApiResponse.fail("This book is already issued to the user.");
+
         Optional<Books> bookOpt = bookDao.findById(req.getIsbn());
         Optional<Reader> readerOpt = readerDao.findById(req.getReaderId());
         Optional<Staff> staffOpt = staffDao.findById(req.getStaffId());
 
         if (bookOpt.isEmpty() || bookOpt.get().getQuantity() <=0) {
-            return ApiResponse.fail("Book not found.");
+            return ApiResponse.fail("Book not found or out of stock.");
         }
         Books book = bookOpt.get();
         Reservation reservation = new Reservation();
 
+        Reader reader;
         if(readerOpt.isPresent()){
-            reservation.setReader(readerOpt.get());
+            reader = readerOpt.get();
+            reservation.setReader(reader);
         }
         else{
-            Reader reader = new Reader();
+            reader = new Reader();
             reader.setUserId(req.getReaderId());
             reader.setName(req.getReaderName());
             reader.setPhones(req.getReaderPhones());
+            reservation.setReader(reader);
         }
 
         if(staffOpt.isEmpty())
@@ -76,7 +85,6 @@ public class ReservationService {
         reservation.setBook(book);
         reservation.setReservationType("ISSUED");
         Reservation savedReservation = resdao.save(reservation);
-        book.setQuantity(book.getQuantity()-1);
         return ApiResponse.ok("Book issued",toResponse(savedReservation));
     }
 
@@ -85,6 +93,8 @@ public class ReservationService {
         if(resOpt.isEmpty())
             return ApiResponse.fail("No data found.");
         Reservation reservation = resOpt.get();
+        if(Objects.equals(reservation.getReservationType(), "RETURNED"))
+            return ApiResponse.fail("Book already returned.");
         Optional<Books> booksOpt = bookDao.findById(reservation.getBook().getIsbn());
         Books book = booksOpt.get();
         book.setQuantity(book.getQuantity()+1);
