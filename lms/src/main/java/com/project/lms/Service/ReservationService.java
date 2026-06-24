@@ -91,6 +91,7 @@ public class ReservationService {
         book.setQuantity(book.getQuantity()+1);
         reservation.setReservationType("RETURNED");
         reservation.setBook(book);
+        reservationDao.save(reservation);
         return ApiResponse.ok("Book returned.", null);
     }
 }
