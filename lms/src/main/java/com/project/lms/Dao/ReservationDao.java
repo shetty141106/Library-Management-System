@@ -20,13 +20,13 @@ public class ReservationDao {
         Session session=sf.openSession();
         Transaction tr= session.beginTransaction();
         try {
-            session.merge(reservation);
+            Reservation savedReservation = session.merge(reservation);
             tr.commit();
+            return savedReservation;
         } catch (Exception e) {
             e.printStackTrace();
             tr.rollback();
         }
-        return reservation;
     }
 
     public void deleteById(Long resid) {
