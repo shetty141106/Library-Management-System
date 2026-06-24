@@ -16,7 +16,7 @@ public class ReservationDao {
 
     private final SessionFactory sf = HibernateUtil.getSessionFactory();
 
-    public void save(Reservation reservation) {
+    public Reservation save(Reservation reservation) {
         Session session=sf.openSession();
         Transaction tr= session.beginTransaction();
         try {
@@ -26,7 +26,7 @@ public class ReservationDao {
             e.printStackTrace();
             tr.rollback();
         }
-
+        return reservation;
     }
 
     public void deleteById(Long resid) {

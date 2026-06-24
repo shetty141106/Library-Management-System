@@ -76,9 +76,9 @@ public class ReservationService {
         book.setQuantity(book.getQuantity()-1);
         reservation.setBook(book);
         reservation.setReservationType("ISSUED");
-        resdao.save(reservation);
+        Reservation savedReservation = resdao.save(reservation);
         book.setQuantity(book.getQuantity()-1);
-        return ApiResponse.ok("Book issued",toResponse(reservation));
+        return ApiResponse.ok("Book issued",toResponse(savedReservation));
     }
 
     public ApiResponse<ReservationResponse> returnBook(Long resid) {
