@@ -19,8 +19,7 @@ public class PublisherService {
     private PublisherResponse toPublisherResponse(Publisher publisher) {
         return new PublisherResponse(
                 publisher.getPublisher_id(),
-                publisher.getName(),
-                publisher.getBooks()
+                publisher.getName()
         );
     }
 

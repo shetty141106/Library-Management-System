@@ -11,5 +11,4 @@ import java.util.List;
 public class PublisherResponse {
     private int publisher_id;
     private String name;
-    private List<BooksResponse> books;
 }
