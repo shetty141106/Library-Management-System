@@ -20,7 +20,7 @@ public class ReservationDao {
         Session session=sf.openSession();
         Transaction tr= session.beginTransaction();
         try {
-            session.merge(reservation);
+            session.persist(reservation);
             tr.commit();
         } catch (Exception e) {
             e.printStackTrace();

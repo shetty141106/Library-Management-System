@@ -8,7 +8,6 @@ import com.project.lms.Entity.RefreshToken;
 import com.project.lms.Entity.Staff;
 import com.project.lms.Security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -117,7 +116,7 @@ public class AuthService {
         if (opt.isEmpty())
             return ApiResponse.fail("User not found.");
         Authentication auth = opt.get();
-        if (!passwordEncoder.matches(auth.getPassword(), req.getOld_password()))
+        if (!passwordEncoder.matches(req.getOld_password(), auth.getPassword()))
             return ApiResponse.fail("Enter valid password.");
         auth.setPassword(passwordEncoder.encode(req.getPassword()));
         authDao.save(auth);
