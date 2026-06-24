@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4caf10f8-3d63-433b-a6f3-647a2e7eb226" name="Changes" comment="Quantity bug solved">
+    <list default="true" id="4caf10f8-3d63-433b-a6f3-647a2e7eb226" name="Changes" comment="getAllReservations endpoint added">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/ReservationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Controller/ReservationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/ReservationDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Dao/ReservationDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/ReservationService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lms/src/main/resources/static/Frontend/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/resources/static/Frontend/App.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/resources/static/Frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/resources/static/Frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lms/src/main/resources/static/Frontend/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/resources/static/Frontend/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -168,7 +165,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782299013834</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="getAllReservations endpoint added">
+      <option name="closed" value="true" />
+      <created>1782319562360</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1782319562360</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -192,6 +197,7 @@
     <MESSAGE value="Update staff bug resolved" />
     <MESSAGE value="Session expired frontend bug solved" />
     <MESSAGE value="Quantity bug solved" />
-    <option name="LAST_COMMIT_MESSAGE" value="Quantity bug solved" />
+    <MESSAGE value="getAllReservations endpoint added" />
+    <option name="LAST_COMMIT_MESSAGE" value="getAllReservations endpoint added" />
   </component>
 </project>

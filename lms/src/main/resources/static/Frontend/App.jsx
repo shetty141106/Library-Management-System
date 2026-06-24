@@ -617,7 +617,7 @@ async function loadReservations() {
             <input
               value={resForm.readerPhones}
               onChange={(event) => setResForm({ ...resForm, readerPhones: event.target.value })}
-              placeholder="9876543210, 9123456780"
+              placeholder=""
             />
           </label>
           <label>
@@ -653,6 +653,7 @@ async function loadReservations() {
                   <th>Staff</th>
                   <th>Issue date</th>
                   <th>Due date</th>
+                  <th>Return date</th>
                   <th>Status</th>
                   <th></th>
                 </tr>
@@ -666,8 +667,11 @@ async function loadReservations() {
                     <td>{res.staff}</td>
                     <td>{res.issueDate}</td>
                     <td>{res.dueDate}</td>
+                    <td>{res.returnDate || "-"}</td>
                     <td>
-                      <span className="tag">{res.reservation_type}</span>
+                      <span className={`tag ${res.reservation_type === 'ISSUED' ? 'tag-issued' : 'tag-returned'}`}>
+                        {res.reservation_type}
+                      </span>
                     </td>
                     <td className="row-actions">
                       {res.reservation_type === "ISSUED" && (
@@ -680,8 +684,8 @@ async function loadReservations() {
                 ))}
                 {!reservations.length && (
                   <tr>
-                    <td colSpan="8" className="empty">
-                      No reservations yet.
+                    <td colSpan="9" className="empty">
+                      {resLoading ? "Loading reservations..." : "No reservations yet."}
                     </td>
                   </tr>
                 )}
