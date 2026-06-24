@@ -70,7 +70,7 @@ function App() {
       .filter((book) => activeCategory === "All" || book.category === activeCategory)
       .filter((book) => {
         if (!term) return true;
-        return [book.isbn, book.title, book.authName, book.category, book.publisherName]
+        return [book.isbn, book.title, book.authName, book.category, book.Quantity, book.publisherName]
           .filter(Boolean)
           .some((value) => String(value).toLowerCase().includes(term));
       })
@@ -116,12 +116,20 @@ function App() {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers
     };
-    return parseApiResponse(
-      await fetch(`${API_URL}${path}`, {
-        ...options,
-        headers
-      })
-    );
+    try {
+          return await parseApiResponse(
+            await fetch(`${API_URL}${path}`, {
+              ...options,
+              headers
+            })
+          );
+        } catch (err) {
+          if (err.message.includes("JWT expired")) {
+            logout("Session expired. Please login again.");
+            throw new Error("Session expired. Please login again.");
+          }
+          throw err;
+        }
   }
 
   async function loadBooks() {
@@ -228,11 +236,11 @@ function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function logout() {
+  function logout(message="") {
     setSession(null);
     setBooks([]);
     setNotice("");
-    setError("");
+    setError(message);
   }
 
   if (!session) {
