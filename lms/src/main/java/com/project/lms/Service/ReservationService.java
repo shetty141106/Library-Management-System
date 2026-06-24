@@ -42,28 +42,37 @@ public class ReservationService {
     }
 
     public ApiResponse<ReservationResponse> issueBook(ReservationRequest req) {
-        if (req.getIsbn() == null || req.getUserid() == null) {
+        if (req.getIsbn() == null || req.getReaderId() == null) {
             return ApiResponse.fail("Book ID and Reader ID are required.");
         }
         Optional<Books> bookOpt = bookDao.findById(req.getIsbn());
-        Optional<Reader> readerOpt = readerDao.findById(req.getUserid());
+        Optional<Reader> readerOpt = readerDao.findById(req.getReaderId());
         Optional<Staff> staffOpt = staffDao.findById(req.getStaffId());
 
-        if (bookOpt.isEmpty() || readerOpt.isEmpty() || staffOpt.isEmpty()) {
-            return ApiResponse.fail("Invalid Book ID or Reader ID.");
+        if (bookOpt.isEmpty() || bookOpt.get().getQuantity() <=0) {
+            return ApiResponse.fail("Book not found.");
+        }
+        Books book = bookOpt.get();
+        Reservation reservation = new Reservation();
+
+        if(readerOpt.isPresent()){
+            reservation.setReader(readerOpt.get());
+        }
+        else{
+            Reader reader = new Reader();
+            reader.setUserId(req.getReaderId());
+            reader.setName(req.getReaderName());
+            reader.setPhones(req.getReaderPhones());
         }
 
-        Books book = bookOpt.get();
-        Reader reader = readerOpt.get();
-        Staff staff = staffOpt.get();
+        if(staffOpt.isEmpty())
+            return ApiResponse.fail("No such staff found..");
 
-        Reservation reservation = new Reservation();
         reservation.setBook(book);
-        reservation.setReader(reader);
         reservation.setIssueDate(LocalDate.now());
         reservation.setReturnDate(req.getReturnDate());
         reservation.setDueDate(LocalDate.now().plusDays(14));
-        reservation.setStaff(staff);
+        reservation.setStaff(staffOpt.get());
         book.setQuantity(book.getQuantity()-1);
         reservation.setBook(book);
         reservation.setReservationType("ISSUED");

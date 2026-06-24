@@ -1,8 +1,7 @@
 package com.project.lms.Service;
 
 import com.project.lms.Dto.ApiResponse;
-import com.project.lms.Dto.ReaderResponse;
-import com.project.lms.Dto.UserResponse;
+import com.project.lms.Dto.ReaderDto;
 import com.project.lms.Entity.Reader;
 import com.project.lms.Dao.ReaderDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +16,8 @@ public class ReaderService {
     @Autowired
     private ReaderDao readerDao;
 
-    private ReaderResponse toReaderResponse(Reader reader) {
-        return new ReaderResponse(
+    private ReaderDto toReaderResponse(Reader reader) {
+        return new ReaderDto(
                 reader.getUserId(),
                 reader.getName(),
                 reader.getEmail(),
@@ -27,7 +26,7 @@ public class ReaderService {
         );
     }
 
-    public ApiResponse<List<ReaderResponse>> getAllReaders() {
+    public ApiResponse<List<ReaderDto>> getAllReaders() {
 
         List<Reader> readers = readerDao.findAll();
 
@@ -35,7 +34,7 @@ public class ReaderService {
             return ApiResponse.fail("No readers found.");
         }
 
-        List<ReaderResponse> response =
+        List<ReaderDto> response =
                 readers.stream()
                         .map(this::toReaderResponse)
                         .toList();
@@ -43,7 +42,7 @@ public class ReaderService {
         return ApiResponse.ok("All readers fetched.", response);
     }
 
-    public ApiResponse<ReaderResponse> getReaderById(Long id) {
+    public ApiResponse<ReaderDto> getReaderById(Long id) {
 
         Optional<Reader> readerOptional = readerDao.findById(id);
 
@@ -54,28 +53,35 @@ public class ReaderService {
 
     }
 
-    public ApiResponse<ReaderResponse> addReader(Reader reader) {
+    public ApiResponse<ReaderDto> addReader(ReaderDto reader) {
 
         if (reader.getName() == null || reader.getName().isBlank()) {
             return ApiResponse.fail("Reader name is required.");
         }
 
         Optional<Reader> existingReader =
-                readerDao.findById(reader.getUserId());
+                readerDao.findById(reader.getId());
 
         if (existingReader.isPresent()) {
             return ApiResponse.fail("Reader already exists.");
         }
 
-        Reader savedReader = readerDao.save(reader);
+        Reader newReader = new Reader();
+        newReader.setUserId(reader.getId());
+        newReader.setName(reader.getName());
+        newReader.setEmail(reader.getEmail());
+        newReader.setAddress(reader.getAddress());
+        newReader.setPhones(reader.getPhones());
+
+        readerDao.save(newReader);
 
         return ApiResponse.ok(
                 "Reader added.",
-                toReaderResponse(savedReader)
+                toReaderResponse(newReader)
         );
     }
 
-    public ApiResponse<ReaderResponse> updateReader(Long id, Reader reader) {
+    public ApiResponse<ReaderDto> updateReader(Long id, ReaderDto reader) {
 
         Optional<Reader> readerOptional =
                 readerDao.findById(id);

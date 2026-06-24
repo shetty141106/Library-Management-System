@@ -1,5 +1,6 @@
 package com.project.lms.Dao;
 
+import com.project.lms.Dto.ReaderDto;
 import com.project.lms.Entity.Reader;
 import com.project.lms.Utility.HibernateUtil;
 import org.hibernate.Session;

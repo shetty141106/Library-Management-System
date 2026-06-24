@@ -5,12 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 public class ReservationRequest {
-    private Long userid;
+    private Long readerId;
+    private String readerName;
+    private List<String> readerPhones;
     private String isbn;
     private Long staffId;
     private LocalDate returnDate;

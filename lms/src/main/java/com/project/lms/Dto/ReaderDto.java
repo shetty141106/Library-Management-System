@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReaderResponse {
+public class ReaderDto {
     private Long id;
     private String name;
     private String email;

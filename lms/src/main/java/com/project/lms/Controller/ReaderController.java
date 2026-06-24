@@ -1,9 +1,7 @@
 package com.project.lms.Controller;
 
 import com.project.lms.Dto.ApiResponse;
-import com.project.lms.Dto.ReaderResponse;
-import com.project.lms.Dto.UserResponse;
-import com.project.lms.Entity.Reader;
+import com.project.lms.Dto.ReaderDto;
 import com.project.lms.Service.ReaderService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +18,9 @@ public class ReaderController {
     private ReaderService readerService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ReaderResponse>>> getAllReaders() {
+    public ResponseEntity<ApiResponse<List<ReaderDto>>> getAllReaders() {
 
-        ApiResponse<List<ReaderResponse>> res =
+        ApiResponse<List<ReaderDto>> res =
                 readerService.getAllReaders();
 
         return res.isSuccess()
@@ -31,10 +29,10 @@ public class ReaderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ReaderResponse>> getReaderById(
+    public ResponseEntity<ApiResponse<ReaderDto>> getReaderById(
             @PathVariable Long id) {
 
-        ApiResponse<ReaderResponse> res =
+        ApiResponse<ReaderDto> res =
                 readerService.getReaderById(id);
 
         return res.isSuccess()
@@ -43,10 +41,10 @@ public class ReaderController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ReaderResponse>> addReader(
-            @RequestBody Reader reader) {
+    public ResponseEntity<ApiResponse<ReaderDto>> addReader(
+            @RequestBody ReaderDto reader) {
 
-        ApiResponse<ReaderResponse> res =
+        ApiResponse<ReaderDto> res =
                 readerService.addReader(reader);
 
         return res.isSuccess()
@@ -55,11 +53,11 @@ public class ReaderController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ReaderResponse>> updateReader(
+    public ResponseEntity<ApiResponse<ReaderDto>> updateReader(
             @PathVariable Long id,
-            @RequestBody Reader reader) {
+            @RequestBody ReaderDto reader) {
 
-        ApiResponse<ReaderResponse> res =
+        ApiResponse<ReaderDto> res =
                 readerService.updateReader(id, reader);
 
         return res.isSuccess()
