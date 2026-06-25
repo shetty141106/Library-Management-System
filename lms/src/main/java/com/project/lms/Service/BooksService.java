@@ -99,6 +99,19 @@ public class BooksService {
             existingBook.setPrice(bookreq.getPrice());
         if(bookreq.getYearOfPublication() > 0)
             existingBook.setYearOfPublication(bookreq.getYearOfPublication());
+        Optional<Publisher> optionalPublisher;
+        if(!bookreq.getPublisherName().isBlank()) {
+            optionalPublisher = pubdao.findByName(bookreq.getPublisherName());
+            Publisher publisher;
+            if(optionalPublisher.isEmpty()){
+                publisher = new Publisher();
+                publisher.setName(bookreq.getPublisherName());
+            }
+            else{
+                publisher = optionalPublisher.get();
+            }
+            existingBook.setPublisher(publisher);
+        }
         booksDao.save(existingBook);
         return ApiResponse.ok("Book updated.", toBookResponse(existingBook));
     }

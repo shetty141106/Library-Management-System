@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4caf10f8-3d63-433b-a6f3-647a2e7eb226" name="Changes" comment="Error message enhanced">
+    <list default="true" id="4caf10f8-3d63-433b-a6f3-647a2e7eb226" name="Changes" comment="Updated App.jsx">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lms/src/main/resources/static/Frontend/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/resources/static/Frontend/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/BooksService.java" beforeDir="false" afterPath="$PROJECT_DIR$/lms/src/main/java/com/project/lms/Service/BooksService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -188,7 +188,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782321864884</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Updated App.jsx">
+      <option name="closed" value="true" />
+      <created>1782385249149</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1782385249149</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -215,6 +223,7 @@
     <MESSAGE value="getAllReservations endpoint added" />
     <MESSAGE value="Frontend Fixed" />
     <MESSAGE value="Error message enhanced" />
-    <option name="LAST_COMMIT_MESSAGE" value="Error message enhanced" />
+    <MESSAGE value="Updated App.jsx" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated App.jsx" />
   </component>
 </project>
