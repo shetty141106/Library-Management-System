@@ -42,7 +42,8 @@ function getStoredSession() {
 
 async function parseApiResponse(response) {
   const payload = await response.json().catch(() => null);
-  if (!response.ok || payload?.status === "fail" || payload?.success === false) {
+  // Safely checks for both 'success: false' or 'status: fail' depending on your Java ApiResponse
+  if (!response.ok || payload?.success === false || payload?.status === "fail") {
     throw new Error(payload?.message || "Request failed.");
   }
   return payload;
@@ -128,19 +129,19 @@ function App() {
       ...options.headers
     };
     try {
-          return await parseApiResponse(
-            await fetch(`${API_URL}${path}`, {
-              ...options,
-              headers
-            })
-          );
-        } catch (err) {
-          if (err.message.includes("JWT expired")) {
-            logout("Session expired. Please login again.");
-            throw new Error("Session expired. Please login again.");
-          }
-          throw err;
-        }
+      return await parseApiResponse(
+        await fetch(`${API_URL}${path}`, {
+          ...options,
+          headers
+        })
+      );
+    } catch (err) {
+      if (err.message.includes("JWT expired") || err.message.includes("expired")) {
+        logout("Session expired. Please login again.");
+        throw new Error("Session expired. Please login again.");
+      }
+      throw err;
+    }
   }
 
   async function loadBooks() {
@@ -157,7 +158,7 @@ function App() {
     }
   }
 
-async function loadReservations() {
+  async function loadReservations() {
     if (!token) return;
     setResLoading(true);
     try {
@@ -269,8 +270,8 @@ async function loadReservations() {
         })
       });
       setNotice(response.message);
-      setReservations((prev) => [response.data, ...prev]);
       setResForm(emptyReservation);
+      await loadReservations();
       await loadBooks();
     } catch (err) {
       setError(err.message);
@@ -288,13 +289,6 @@ async function loadReservations() {
         method: "POST"
       });
       setNotice(response.message);
-      setReservations((prev) =>
-        prev.map((res) =>
-          res.reservationId === reservationId
-            ? { ...res, reservation_type: "RETURNED" }
-            : res
-        )
-      );
       await loadReservations();
       await loadBooks();
     } catch (err) {
@@ -315,11 +309,15 @@ async function loadReservations() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function logout(message="") {
+  function logout(message = "") {
+    console.log("Logout triggered!");
+    localStorage.removeItem("lms-session");
     setSession(null);
     setBooks([]);
+    setReservations([]);
     setNotice("");
-    setError(message);
+    const errorMessage = typeof message === "string" ? message : "";
+    setError(errorMessage);
   }
 
   if (!session) {
@@ -447,7 +445,7 @@ async function loadReservations() {
         </div>
         <div className="user-actions">
           <span>{session.name || session.email}</span>
-          <button onClick={logout}>Logout</button>
+          <button onClick={() => logout()} type="button">Logout</button>
         </div>
       </header>
 
@@ -519,7 +517,7 @@ async function loadReservations() {
                 <option value="price">Price</option>
                 <option value="year">Newest</option>
               </select>
-              <button onClick={loadBooks} disabled={loading}>
+              <button onClick={loadBooks} disabled={loading} type="button">
                 Refresh
               </button>
             </div>
@@ -568,8 +566,8 @@ async function loadReservations() {
                     <td>{book.quantity}</td>
                     <td>Rs. {Number(book.price || 0).toFixed(2)}</td>
                     <td className="row-actions">
-                      <button onClick={() => startEdit(book)}>Edit</button>
-                      <button className="danger" onClick={() => setPendingDelete(book)}>
+                      <button onClick={() => startEdit(book)} type="button">Edit</button>
+                      <button className="danger" onClick={() => setPendingDelete(book)} type="button">
                         Delete
                       </button>
                     </td>
@@ -640,7 +638,7 @@ async function loadReservations() {
             <div>
               <p className="eyebrow">Reservation dashboard</p>
               <h2>Active reservations</h2>
-              <p className="muted">{reservations.length} reservations this session</p>
+              <p className="muted">Total {reservations.length} historical reservations</p>
             </div>
           </div>
 
@@ -676,7 +674,7 @@ async function loadReservations() {
                     </td>
                     <td className="row-actions">
                       {res.reservation_type === "ISSUED" && (
-                        <button onClick={() => returnReservation(res.reservationId)} disabled={resLoading}>
+                        <button onClick={() => returnReservation(res.reservationId)} disabled={resLoading} type="button">
                           Return
                         </button>
                       )}
@@ -712,7 +710,7 @@ async function loadReservations() {
               <button onClick={() => setPendingDelete(null)} type="button">
                 Keep book
               </button>
-              <button className="primary danger-primary" onClick={() => deleteBook(pendingDelete)}>
+              <button className="primary danger-primary" onClick={() => deleteBook(pendingDelete)} type="button">
                 Delete book
               </button>
             </div>
@@ -759,11 +757,22 @@ function Stat({ label, value, tone }) {
 }
 
 function Status({ notice, error }) {
-  if (!notice && !error) return null;
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    if (notice || error) {
+      setVisible(true);
+      const timer = setTimeout(() => setVisible(false), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [notice, error]);
+
+  if (!visible || (!notice && !error)) return null;
+
   return (
-    <p className={error ? "status error" : "status success"} role="status">
+    <div className={error ? "status error" : "status success"} role="status">
       {error || notice}
-    </p>
+    </div>
   );
 }
 
